@@ -526,15 +526,43 @@ async function confirmar() {
     'Tipo':              'Preventa',
   };
   try {
-    await fetch(CFG.sheetUrl, {
-      method:'POST', mode:'no-cors',
-      headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify(payload),
-    });
+    await saveViaScript(payload);
   } catch(e){console.warn(e)}
 
   document.getElementById('overlay').classList.remove('show');
   setStep(3);
+}
+
+// Guarda la reserva usando JSONP (GET) — evita el problema de redirect de Apps Script
+function saveViaScript(payload) {
+  return new Promise(function(resolve) {
+    var cbName = 'chamicoCb_save_' + Date.now();
+    var script = document.createElement('script');
+    var done   = false;
+
+    window[cbName] = function(data) {
+      if (done) return; done = true;
+      delete window[cbName];
+      if (document.head.contains(script)) document.head.removeChild(script);
+      resolve(data);
+    };
+
+    script.src = CFG.sheetUrl
+      + '?callback=' + cbName
+      + '&action=save'
+      + '&data=' + encodeURIComponent(JSON.stringify(payload));
+
+    script.onerror = function() {
+      if (done) return; done = true;
+      resolve({ status: 'error' });
+    };
+
+    setTimeout(function() {
+      if (!done) { done = true; resolve({ status: 'timeout' }); }
+    }, 10000);
+
+    document.head.appendChild(script);
+  });
 }
 
 function setStep(n) {
