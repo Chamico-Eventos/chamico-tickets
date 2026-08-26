@@ -207,12 +207,12 @@ src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAYAAABS39xVAACvxUlEQ
   <div class="row2">
     <div class="field-group">
       <label class="field-label" for="f-nombre">Nombre *</label>
-      <input type="text" class="field-input" id="f-nombre" placeholder="Juan" autocomplete="given-name">
+      <input type="text" class="field-input" id="f-nombre" placeholder="Juan" autocomplete="nope">
       <div class="field-error" id="e-nombre">Ingresá tu nombre</div>
     </div>
     <div class="field-group">
       <label class="field-label" for="f-apellido">Apellido *</label>
-      <input type="text" class="field-input" id="f-apellido" placeholder="García" autocomplete="family-name">
+      <input type="text" class="field-input" id="f-apellido" placeholder="García" autocomplete="nope">
       <div class="field-error" id="e-apellido">Ingresá tu apellido</div>
     </div>
   </div>
@@ -308,6 +308,11 @@ src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAYAAABS39xVAACvxUlEQ
   <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.28);border-radius:var(--r);padding:13px 15px;font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px">
     <span style="font-size:18px;flex-shrink:0;line-height:1.4">📋</span>
     <span><strong style="color:var(--gold2)">Guardá el comprobante</strong> de la transferencia — te lo vamos a pedir por WhatsApp y puede que lo necesites en la puerta el día del evento.</span>
+  </div>
+
+  <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border2);border-radius:var(--r);padding:12px 15px;font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:14px">
+    <strong style="color:var(--ink2)">☔ Política del evento:</strong> El evento no se suspende por condiciones climáticas adversas, incluyendo lluvia.
+    En caso de suspensión total por causas de fuerza mayor, todos los compradores serán notificados por email y recibirán el reintegro del 100% del valor abonado.
   </div>
 
   <button class="btn-primary" onclick="confirmar()">Ya transferí — Registrar mi reserva →</button>
