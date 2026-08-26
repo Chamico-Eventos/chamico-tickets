@@ -438,6 +438,11 @@ function renderCatalog() {
   var sorted = EVENTS.slice().sort(function(a,b){ return a.dateSort - b.dateSort; });
   var grid = document.getElementById('events-grid');
   grid.innerHTML = sorted.map(createEventCard).join('');
+  // Add click handlers — avoids inline onclick escaping issues
+  sorted.forEach(function(ev) {
+    var btn = document.getElementById('btn-' + ev.id);
+    if (btn) btn.addEventListener('click', function() { selectEvent(ev.id); });
+  });
 }
 
 function createEventCard(ev) {
@@ -459,7 +464,7 @@ function createEventCard(ev) {
       '<span class="ev-price">$' + ev.price.toLocaleString('es-AR') + '</span>' +
       '<span class="preventa-badge" style="font-size:9px;padding:2px 8px">Preventa</span>' +
     '</div>' +
-    '<button class="ev-btn" id="btn-'+ev.id+'" onclick="selectEvent(\''+ev.id+'\')">' +
+    '<button class="ev-btn" id="btn-'+ev.id+'" data-evid="'+ev.id+'">' +
       'Ver y comprar entradas →' +
     '</button>' +
     '<p class="ev-avail" id="avail-'+ev.id+'">Verificando disponibilidad…</p>' +
