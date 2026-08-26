@@ -438,11 +438,7 @@ function renderCatalog() {
   var sorted = EVENTS.slice().sort(function(a,b){ return a.dateSort - b.dateSort; });
   var grid = document.getElementById('events-grid');
   grid.innerHTML = sorted.map(createEventCard).join('');
-  // Add click handlers — avoids inline onclick escaping issues
-  sorted.forEach(function(ev) {
-    var btn = document.getElementById('btn-' + ev.id);
-    if (btn) btn.addEventListener('click', function() { selectEvent(ev.id); });
-  });
+
 }
 
 function createEventCard(ev) {
@@ -464,7 +460,7 @@ function createEventCard(ev) {
       '<span class="ev-price">$' + ev.price.toLocaleString('es-AR') + '</span>' +
       '<span class="preventa-badge" style="font-size:9px;padding:2px 8px">Preventa</span>' +
     '</div>' +
-    '<button class="ev-btn" id="btn-'+ev.id+'" data-evid="'+ev.id+'">' +
+    '<button class="ev-btn" id="btn-'+ev.id+'" data-evid="'+ev.id+'" onclick="window.selectEvent(this.dataset.evid)">' +
       'Ver y comprar entradas →' +
     '</button>' +
     '<p class="ev-avail" id="avail-'+ev.id+'">Verificando disponibilidad…</p>' +
@@ -489,11 +485,14 @@ function checkEventAvail(ev) {
       avEl.textContent = '🔴 Entradas agotadas';
       avEl.style.color = 'var(--danger)';
       btnEl.disabled = true; btnEl.textContent = 'Agotadas';
-    } else if (avail <= 15) {
-      avEl.textContent = '⚡ Últimas ' + avail + ' entradas!';
-      avEl.style.color = 'var(--orange)';
-    } else {
-      avEl.textContent = avail + ' entradas disponibles';
+        } else {
+      var threshold = Math.ceil((typeof ev.maxTickets === 'number' ? ev.maxTickets : 350) * 0.1);
+      if (avail <= threshold) {
+        avEl.textContent = '\u26a1 \u00daltimas ' + avail + ' entradas!';
+        avEl.style.color = 'var(--orange)';
+      } else {
+        avEl.textContent = '';   // plenty available — hide counter
+      }
     }
   };
 
@@ -504,7 +503,7 @@ function checkEventAvail(ev) {
 }
 
 // ── SELECT EVENT: switch to purchase view ─────────────────────
-function selectEvent(eventId) {
+window.selectEvent = function(eventId) {
   var ev = EVENTS.find(function(e){ return e.id === eventId; });
   if (!ev) return;
 
@@ -539,7 +538,7 @@ function selectEvent(eventId) {
   document.getElementById('view-catalog').style.display = 'none';
   document.getElementById('view-event').style.display   = 'block';
   window.scrollTo({top:0, behavior:'smooth'});
-}
+};
 
 // ── SHOW CATALOG ──────────────────────────────────────────────
 function showCatalog() {
