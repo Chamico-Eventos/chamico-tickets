@@ -226,7 +226,10 @@ src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAYAAABS39xVAACvxUlEQ
   <div class="row2">
     <div class="field-group">
       <label class="field-label" for="f-tel">Teléfono *</label>
-      <input type="tel" class="field-input" id="f-tel" placeholder="11 1234 5678" autocomplete="tel" inputmode="numeric" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'');telFeedback()" onblur="telFeedback()">
+      <div style="display:flex;align-items:stretch">
+        <span style="background:var(--surface2);border:1px solid var(--border2);border-right:none;border-radius:var(--r) 0 0 var(--r);padding:12px 14px;font-size:15px;color:var(--gold);white-space:nowrap;font-weight:600;display:flex;align-items:center">+549</span>
+        <input type="tel" class="field-input" id="f-tel" placeholder="11 1234 5678" autocomplete="tel" inputmode="numeric" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'');telFeedback()" onblur="telFeedback()" style="border-radius:0 var(--r) var(--r) 0;border-left:none;flex:1">
+      </div>
       <div id="tel-feedback" style="font-size:11px;color:var(--muted);margin-top:4px;min-height:15px;font-style:italic;transition:color 0.2s"></div>
       <div class="field-error" id="e-tel">Ingresá 10 dígitos (ej: 11 1234 5678)</div>
     </div>
@@ -447,7 +450,7 @@ function telFeedback() {
   if (val.length === 0) {
     fb.textContent = '';
   } else if (val.length < 10) {
-    fb.style.color = 'var(--muted)';
+    fb.style.color = 'var(--danger)';
     fb.textContent = val.length + ' / 10 dígitos';
   } else {
     fb.style.color = 'var(--green)';
