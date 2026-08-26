@@ -95,7 +95,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .btn-primary:active{transform:scale(0.98)}
 .btn-primary:disabled{opacity:0.25;cursor:not-allowed;transform:none}
 .btn-secondary{width:100%;margin-top:10px;padding:12px;background:transparent;border:1px solid var(--border2);border-radius:var(--r);color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:all 0.15s}
-.btn-secondary:hover{border-color:var(--border);color:var(--ink2)}
+.btn-secondary:hover{background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.4);color:var(--gold2)}
 
 /* PAYMENT */
 .pay-summary{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:18px;margin-bottom:14px}
@@ -173,8 +173,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .ev-btn{width:100%;padding:14px;border-radius:var(--r);border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0e0d0b;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:auto}
 .ev-btn:hover{filter:brightness(1.07);transform:translateY(-1px)}
 .ev-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;filter:none}
-.back-btn{display:flex;align-items:center;gap:8px;max-width:520px;margin:0 auto;padding:14px 20px;background:none;border:none;color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:color .15s}
-.back-btn:hover{color:var(--ink2)}
+.back-btn{display:flex;align-items:center;justify-content:center;gap:8px;max-width:520px;margin:0 auto 4px;padding:12px 20px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:var(--r);color:var(--gold);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;letter-spacing:.02em}
+.back-btn:hover{background:rgba(201,168,76,0.12);color:var(--gold2);border-color:rgba(201,168,76,0.45)}
 .cat-footer-wrap{text-align:center;padding:20px 24px 32px;border-top:1px solid rgba(255,255,255,.06)}
 </style>
 </head>
@@ -346,7 +346,7 @@ src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAYAAABS39xVAACvxUlEQ
   </div>
 
   <div class="note-box">
-    <strong>Importante:</strong> El lugar queda reservado pero no confirmado hasta que recibamos el comprobante por WhatsApp. Te avisamos cuando todo esté OK.
+    <strong>Importante:</strong> El lugar queda reservado pero no confirmado hasta que recibamos el comprobante por WhatsApp. Una vez verificado, <strong>te llega un email de confirmación</strong> con todos los detalles. Revisá también el spam.
   </div>
 
   <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.28);border-radius:var(--r);padding:13px 15px;font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px">
@@ -447,7 +447,7 @@ function createEventCard(ev) {
     : '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[0]+'\')"></div>' +
       '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[1]+'\')"></div>';
 
-  return '<div class="ev-card">' +
+  return '<div class="ev-card" data-evid="'+ev.id+'">' +
     '<div class="ev-card-img">' + imgHtml + '</div>' +
     '<div class="ev-card-body">' +
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
@@ -460,7 +460,7 @@ function createEventCard(ev) {
       '<span class="ev-price">$' + ev.price.toLocaleString('es-AR') + '</span>' +
       '<span class="preventa-badge" style="font-size:9px;padding:2px 8px">Preventa</span>' +
     '</div>' +
-    '<button class="ev-btn" id="btn-'+ev.id+'" data-evid="'+ev.id+'" onclick="window.selectEvent(this.dataset.evid)">' +
+    '<button class="ev-btn" id="btn-'+ev.id+'">'  +
       'Ver y comprar entradas →' +
     '</button>' +
     '<p class="ev-avail" id="avail-'+ev.id+'">Verificando disponibilidad…</p>' +
@@ -526,6 +526,7 @@ window.selectEvent = function(eventId) {
     sheetUrl:           ev.sheetUrl,
     city:               ev.city     || '',
     mapsLink:           ev.mapsLink || '',
+    price:              ev.price     || 25000,
   };
 
   // ── Init form (wrapped so errors never block navigation) ───────
@@ -562,9 +563,13 @@ EVENTS.forEach(checkEventAvail);
   var grid = document.getElementById('events-grid');
   if (grid) {
     grid.addEventListener('click', function(e) {
+      // Walk up from click target to find ev-card with data-evid
       var t = e.target;
       while (t && t !== grid) {
-        if (t.dataset && t.dataset.evid) { window.selectEvent(t.dataset.evid); return; }
+        if (t.classList && t.classList.contains('ev-card') && t.dataset.evid) {
+          window.selectEvent(t.dataset.evid);
+          return;
+        }
         t = t.parentElement;
       }
     });
@@ -627,7 +632,7 @@ function updateCounterMax() {
   const maxBuy = Math.min(available, MAX_PER_BUY);
   if (qty > maxBuy) qty = maxBuy;
   document.getElementById('qtyNum').textContent = qty;
-  document.getElementById('totalVal').textContent = ars(qty * PRICE);
+  document.getElementById('totalVal').textContent = ars(qty * (CFG && CFG.price ? CFG.price : PRICE));
   document.getElementById('btnMinus').disabled = qty <= 1;
   document.getElementById('btnPlus').disabled  = qty >= maxBuy;
 }
@@ -673,7 +678,7 @@ function changeQty(d) {
   const maxBuy = Math.min(available, MAX_PER_BUY);
   qty = Math.max(1, Math.min(qty + d, maxBuy));
   document.getElementById('qtyNum').textContent = qty;
-  document.getElementById('totalVal').textContent = ars(qty * PRICE);
+  document.getElementById('totalVal').textContent = ars(qty * (CFG && CFG.price ? CFG.price : PRICE));
   document.getElementById('btnMinus').disabled = qty <= 1;
   document.getElementById('btnPlus').disabled  = qty >= maxBuy;
 }
