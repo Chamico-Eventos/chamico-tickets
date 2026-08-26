@@ -504,10 +504,18 @@ function checkEventAvail(ev) {
 
 // ── SELECT EVENT: switch to purchase view ─────────────────────
 window.selectEvent = function(eventId) {
-  var ev = EVENTS.find(function(e){ return e.id === eventId; });
-  if (!ev) return;
+  // ── Navigate FIRST — before anything that could throw ─────────
+  var catalog   = document.getElementById('view-catalog');
+  var eventView = document.getElementById('view-event');
+  if (catalog)   catalog.style.display   = 'none';
+  if (eventView) eventView.style.display = 'block';
+  window.scrollTo({top: 0, behavior: 'smooth'});
 
-  // Update CFG
+  // ── Find event ─────────────────────────────────────────────────
+  var ev = EVENTS.find(function(e) { return e.id === eventId; });
+  if (!ev) { console.error('Event not found:', eventId); return; }
+
+  // ── Update CFG ─────────────────────────────────────────────────
   CFG = {
     eventName:          ev.name,
     eventDate:          ev.dateDisplay,
@@ -516,28 +524,26 @@ window.selectEvent = function(eventId) {
     mpAlias:            ev.mpAlias,
     whatsapp:           ev.whatsapp,
     sheetUrl:           ev.sheetUrl,
-    city:               ev.city || '',
+    city:               ev.city     || '',
     mapsLink:           ev.mapsLink || '',
   };
 
-  // Update header
-  document.getElementById('hEventName').innerHTML  = '<em>' + CFG.eventName + '</em> en el Chamico';
-  document.getElementById('hEventDate').textContent = CFG.eventDate;
-  document.getElementById('aliasDisplay').textContent = CFG.mpAlias;
-
-  // Reset state
-  qty = 1;
-  available = ev.maxTickets;
-  updateCounterMax();
-  setStep(1);
-
-  // Check availability for this event
-  loadAvailability();
-
-  // Show event view
-  document.getElementById('view-catalog').style.display = 'none';
-  document.getElementById('view-event').style.display   = 'block';
-  window.scrollTo({top:0, behavior:'smooth'});
+  // ── Init form (wrapped so errors never block navigation) ───────
+  try {
+    var hName = document.getElementById('hEventName');
+    var hDate = document.getElementById('hEventDate');
+    var alias = document.getElementById('aliasDisplay');
+    if (hName)  hName.innerHTML  = '<em>' + CFG.eventName + '</em> en el Chamico';
+    if (hDate)  hDate.textContent = CFG.eventDate;
+    if (alias)  alias.textContent = CFG.mpAlias;
+    qty       = 1;
+    available = ev.maxTickets;
+    updateCounterMax();
+    setStep(1);
+    loadAvailability();
+  } catch(err) {
+    console.error('selectEvent init error:', err);
+  }
 };
 
 // ── SHOW CATALOG ──────────────────────────────────────────────
@@ -550,6 +556,20 @@ function showCatalog() {
 // ── INIT: render catalog on page load ─────────────────────────
 renderCatalog();
 EVENTS.forEach(checkEventAvail);
+
+// Delegated click listener — bulletproof backup
+(function() {
+  var grid = document.getElementById('events-grid');
+  if (grid) {
+    grid.addEventListener('click', function(e) {
+      var t = e.target;
+      while (t && t !== grid) {
+        if (t.dataset && t.dataset.evid) { window.selectEvent(t.dataset.evid); return; }
+        t = t.parentElement;
+      }
+    });
+  }
+})();
 
 // ─────────────────────────────────────────────────────────
 //  CONFIGURACIÓN — editá estos 5 valores antes de publicar
