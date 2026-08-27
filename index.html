@@ -295,7 +295,7 @@ src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAYAAABS39xVAACvxUlEQ
           Entrada general
           <span class="preventa-badge" style="font-size:9px;padding:2px 8px">Preventa</span>
         </div>
-        <div class="counter-price">$25.000 por persona</div>
+        <div class="counter-price" id="unitPriceText">$25.000 por persona</div>
         <div class="counter-door">En puerta: precio a confirmar</div>
       </div>
       <div class="counter-ctrl">
@@ -622,7 +622,10 @@ function updateCounterMax() {
   const maxBuy = Math.min(available, MAX_PER_BUY);
   if (qty > maxBuy) qty = maxBuy;
   document.getElementById('qtyNum').textContent = qty;
-  document.getElementById('totalVal').textContent = ars(qty * (CFG && CFG.price ? CFG.price : PRICE));
+  var unitP = (CFG && CFG.price) ? CFG.price : PRICE;
+  var unitEl = document.getElementById('unitPriceText');
+  if (unitEl) unitEl.textContent = '$' + unitP.toLocaleString('es-AR') + ' por persona';
+  document.getElementById('totalVal').textContent = ars(qty * unitP);
   document.getElementById('btnMinus').disabled = qty <= 1;
   document.getElementById('btnPlus').disabled  = qty >= maxBuy;
 }
@@ -721,7 +724,7 @@ function goStep2() {
     email:    document.getElementById('f-email').value.trim(),
     tel:      document.getElementById('f-tel').value.trim(),
     dni:      document.getElementById('f-dni').value.trim(),
-    qty, total: qty * PRICE,
+    qty, total:    qty * ((CFG && CFG.price) ? CFG.price : PRICE),
   };
   document.getElementById('s-nombre').textContent  = user.nombre + ' ' + user.apellido;
   document.getElementById('s-detalle').textContent =
