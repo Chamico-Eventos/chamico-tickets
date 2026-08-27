@@ -437,144 +437,21 @@ const EVENTS = [
 function renderCatalog() {
   var sorted = EVENTS.slice().sort(function(a,b){ return a.dateSort - b.dateSort; });
   var grid = document.getElementById('events-grid');
-  grid.innerHTML = sorted.map(createEventCard).join('');
+    grid.innerHTML = sorted.map(createEventCard).join('');
 
-}
-
-function createEventCard(ev) {
-  var imgHtml = ev.images.length === 1
-    ? '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[0]+'\');background-size:'+(ev.imageContain?'contain':'cover')+';background-repeat:no-repeat;background-color:#0e0d0b;flex:1"></div>'
-    : '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[0]+'\')"></div>' +
-      '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[1]+'\')"></div>';
-
-  return '<div class="ev-card" data-evid="'+ev.id+'" onclick="window.selectEvent(this.dataset.evid)" style="cursor:pointer">' +
-    '<div class="ev-card-img">' + imgHtml + '</div>' +
-    '<div class="ev-card-body">' +
-    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
-    (ev.venueLogo ? '<img src="'+ev.venueLogo+'" style="height:22px;width:22px;border-radius:50%;opacity:.75;flex-shrink:0">' : '') +
-    '<span class="ev-venue" style="margin-bottom:0">' + ev.venue + (ev.city ? ' · ' + ev.city : '') + '</span>' +
-    '</div>' +
-    '<h2 class="ev-name">' + ev.name + '</h2>' +
-    '<p class="ev-date">' + ev.dateDisplay + '</p>' +
-    '<div class="ev-price-row">' +
-      '<span class="ev-price">$' + ev.price.toLocaleString('es-AR') + '</span>' +
-      '<span class="preventa-badge" style="font-size:9px;padding:2px 8px">Preventa</span>' +
-    '</div>' +
-    '<button class="ev-btn" id="btn-'+ev.id+'">'  +
-      'Ver y comprar entradas →' +
-    '</button>' +
-    '<p class="ev-avail" id="avail-'+ev.id+'">Verificando disponibilidad…</p>' +
-    '</div></div>';
-}
-
-// ── CATALOG: check availability per event ──────────────────────
-function checkEventAvail(ev) {
-  var cbName = 'chamicoCb_cat_' + ev.id.replace(/-/g,'_') + '_' + Date.now();
-  var script = document.createElement('script');
-  var done = false;
-
-  window[cbName] = function(data) {
-    if (done) return; done = true;
-    delete window[cbName];
-    if (document.head.contains(script)) document.head.removeChild(script);
-    var avEl = document.getElementById('avail-' + ev.id);
-    var btnEl = document.getElementById('btn-' + ev.id);
-    if (!avEl) return;
-    var avail = (typeof data.available === 'number') ? data.available : ev.maxTickets;
-    if (avail <= 0) {
-      avEl.textContent = '🔴 Entradas agotadas';
-      avEl.style.color = 'var(--danger)';
-      btnEl.disabled = true; btnEl.textContent = 'Agotadas';
-        } else {
-      var threshold = Math.ceil((typeof ev.maxTickets === 'number' ? ev.maxTickets : 350) * 0.1);
-      if (avail <= threshold) {
-        avEl.textContent = '\u26a1 \u00daltimas ' + avail + ' entradas!';
-        avEl.style.color = 'var(--orange)';
-      } else {
-        avEl.textContent = '';   // plenty available — hide counter
-      }
+  // Assign onclick directly to each card element — safest possible approach
+  // No string escaping, no data-attribute reads, direct DOM reference
+  sorted.forEach(function(ev) {
+    var evId = String(ev.id);  // capture as plain string
+    var card = grid.querySelector('[data-evid="' + evId + '"]');
+    if (card) {
+      card.onclick = function(e) {
+        e.stopPropagation();
+        window.selectEvent(evId);
+      };
     }
-  };
-
-  script.src = ev.sheetUrl + '?callback=' + cbName + '&evento=' + encodeURIComponent(ev.name);
-  script.onerror = function() { if (!done) { done=true; var el=document.getElementById('avail-'+ev.id); if(el) el.textContent=''; } };
-  setTimeout(function() { if (!done) { done=true; var el=document.getElementById('avail-'+ev.id); if(el) el.textContent=''; } }, 8000);
-  document.head.appendChild(script);
+  });
 }
-
-// ── SELECT EVENT: switch to purchase view ─────────────────────
-window.selectEvent = function(eventId) {
-  // ── Navigate FIRST — before anything that could throw ─────────
-  var catalog   = document.getElementById('view-catalog');
-  var eventView = document.getElementById('view-event');
-  if (catalog)   catalog.style.display   = 'none';
-  if (eventView) eventView.style.display = 'block';
-  window.scrollTo({top: 0, behavior: 'smooth'});
-
-  // ── Find event ─────────────────────────────────────────────────
-  var ev = EVENTS.find(function(e) { return e.id === eventId; });
-  if (!ev) { console.error('Event not found:', eventId); return; }
-
-  // ── Update CFG ─────────────────────────────────────────────────
-  CFG = {
-    eventName:          ev.name,
-    eventDate:          ev.dateDisplay,
-    eventDateFormatted: ev.dateFormatted,
-    venue:              ev.venue,
-    mpAlias:            ev.mpAlias,
-    whatsapp:           ev.whatsapp,
-    sheetUrl:           ev.sheetUrl,
-    city:               ev.city     || '',
-    mapsLink:           ev.mapsLink || '',
-    price:              ev.price     || 25000,
-  };
-
-  // ── Init form (wrapped so errors never block navigation) ───────
-  try {
-    var hName = document.getElementById('hEventName');
-    var hDate = document.getElementById('hEventDate');
-    var alias = document.getElementById('aliasDisplay');
-    if (hName)  hName.innerHTML  = '<em>' + CFG.eventName + '</em> en el Chamico';
-    if (hDate)  hDate.textContent = CFG.eventDate;
-    if (alias)  alias.textContent = CFG.mpAlias;
-    qty       = 1;
-    available = ev.maxTickets;
-    updateCounterMax();
-    setStep(1);
-    loadAvailability();
-  } catch(err) {
-    console.error('selectEvent init error:', err);
-  }
-};
-
-// ── SHOW CATALOG ──────────────────────────────────────────────
-function showCatalog() {
-  document.getElementById('view-catalog').style.display = 'block';
-  document.getElementById('view-event').style.display   = 'none';
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-// ── INIT: render catalog on page load ─────────────────────────
-renderCatalog();
-EVENTS.forEach(checkEventAvail);
-
-// Delegated click listener — bulletproof backup
-(function() {
-  var grid = document.getElementById('events-grid');
-  if (grid) {
-    grid.addEventListener('click', function(e) {
-      // Walk up from click target to find ev-card with data-evid
-      var t = e.target;
-      while (t && t !== grid) {
-        if (t.classList && t.classList.contains('ev-card') && t.dataset.evid) {
-          window.selectEvent(t.dataset.evid);
-          return;
-        }
-        t = t.parentElement;
-      }
-    });
-  }
-})();
 
 // ─────────────────────────────────────────────────────────
 //  CONFIGURACIÓN — editá estos 5 valores antes de publicar
@@ -838,6 +715,9 @@ function copyAlias() {
     document.execCommand('copy'); document.body.removeChild(el); copy();
   }
 }
+// ── INIT ─────────────────────────────────────────
+renderCatalog();
+EVENTS.forEach(checkEventAvail);
 </script>
 <!-- POWERED BY FOOTER -->
 <footer style="margin-top:48px;padding:24px 24px 36px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)">
