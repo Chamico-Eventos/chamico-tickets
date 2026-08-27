@@ -447,7 +447,7 @@ function createEventCard(ev) {
     : '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[0]+'\')"></div>' +
       '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[1]+'\')"></div>';
 
-  return '<div class="ev-card" data-evid="'+ev.id+'">' +
+  return '<div class="ev-card" data-evid="'+ev.id+'" onclick="window.selectEvent(this.dataset.evid)" style="cursor:pointer">' +
     '<div class="ev-card-img">' + imgHtml + '</div>' +
     '<div class="ev-card-body">' +
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
