@@ -787,54 +787,35 @@ async function confirmar() {
   setStep(3);
 }
 
-// Guarda la reserva — 3 métodos simultáneos para máxima compatibilidad
+// Guarda la reserva — proxy Vercel (mismo dominio, sin bloqueos iOS)
 function saveViaScript(payload) {
-  var json    = JSON.stringify(payload);
-  var encoded = encodeURIComponent(json);
-  var base    = CFG.sheetUrl;
-  var getUrl  = base + '?action=save&data=' + encoded;
+  var json = JSON.stringify(payload);
+  var saved = false;
 
-  // ── Método 1: Fetch GET (desktop + Android) ─────────────────────
-  try { fetch(getUrl, { method: 'GET', mode: 'no-cors' }); } catch(e) {}
+  // Intento 1: proxy /api/save (mismo dominio → iOS nunca bloquea)
+  fetch('/api/save', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    json,
+  }).then(function() {
+    saved = true;
+  }).catch(function() {});
 
-  // ── Método 2: Hidden form GET → iframe (iOS Safari, más compatible) ──
-  // Los form-submit no tienen restricciones de CORS ni tracking prevention
-  try {
-    var ifr = document.createElement('iframe');
-    ifr.name = 'sv' + Date.now();
-    ifr.style.cssText = 'display:none;width:0;height:0;border:0;position:absolute';
-    document.body.appendChild(ifr);
-    var frm = document.createElement('form');
-    frm.method = 'GET';
-    frm.action = base;
-    frm.target = ifr.name;
-    frm.style.display = 'none';
-    var ia = document.createElement('input');
-    ia.name = 'action'; ia.value = 'save'; frm.appendChild(ia);
-    var id = document.createElement('input');
-    id.name = 'data';   id.value = json;   frm.appendChild(id);
-    document.body.appendChild(frm);
-    frm.submit();
-    setTimeout(function() {
-      if (frm.parentNode)   frm.parentNode.removeChild(frm);
-      if (ifr.parentNode)   ifr.parentNode.removeChild(ifr);
-    }, 8000);
-  } catch(e) {}
+  // Intento 2: directo al Apps Script (backup para desktop si el proxy tarda)
+  // Solo dispara si el proxy no respondió en 2.5s — evita duplicados
+  setTimeout(function() {
+    if (!saved) {
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json), true);
+        xhr.send();
+      } catch(e) {}
+    }
+  }, 2500);
 
-  // ── Método 3: JSONP (desktop, con callback) ──────────────────────
-  try {
-    var cbName = 'cb_' + Date.now();
-    var sc = document.createElement('script');
-    window[cbName] = function() { delete window[cbName]; };
-    sc.onerror = function() {};
-    sc.src = getUrl + '&callback=' + cbName;
-    document.head.appendChild(sc);
-  } catch(e) {}
-
-  // Resolver inmediato — los 3 métodos corren en background
-  // La pantalla de éxito aparece de inmediato sin esperar la red
+  // Mostrar pantalla de éxito sin esperar la red
   return new Promise(function(resolve) {
-    setTimeout(function() { resolve({ status: 'ok' }); }, 400);
+    setTimeout(function() { resolve({ status: 'ok' }); }, 500);
   });
 }
 
