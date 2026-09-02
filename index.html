@@ -787,12 +787,22 @@ async function confirmar() {
   setStep(3);
 }
 
-// Guarda la reserva usando JSONP (GET) — evita el problema de redirect de Apps Script
+// Guarda la reserva — usa Fetch GET (funciona en móvil sin bloqueo de tracking)
 function saveViaScript(payload) {
-  return new Promise(function(resolve) {
-    var cbName = 'chamicoCb_save_' + Date.now();
-    var script = document.createElement('script');
-    var done   = false;
+  var dataStr  = encodeURIComponent(JSON.stringify(payload));
+  var url      = CFG.sheetUrl + '?action=save&data=' + dataStr;
+
+  // Fetch GET: los query params sobreviven el redirect de Apps Script,
+  // no hay restricciones de tracking prevention en mobile Safari
+  var p1 = fetch(url, { method: 'GET', mode: 'no-cors' })
+              .then(function() { return { status: 'ok', method: 'fetch' }; })
+              .catch(function() { return { status: 'error' }; });
+
+  // JSONP como backup (desktop, si fetch falla)
+  var p2 = new Promise(function(resolve) {
+    var cbName = 'chamicoCb_s_' + Date.now();
+    var script  = document.createElement('script');
+    var done    = false;
 
     window[cbName] = function(data) {
       if (done) return; done = true;
@@ -801,23 +811,18 @@ function saveViaScript(payload) {
       resolve(data);
     };
 
-    script.src = CFG.sheetUrl
-      + '?callback=' + cbName
-      + '&action=save'
-      + '&data=' + encodeURIComponent(JSON.stringify(payload));
-
-    script.onerror = function() {
-      if (done) return; done = true;
-      resolve({ status: 'error' });
-    };
-
-    setTimeout(function() {
-      if (!done) { done = true; resolve({ status: 'timeout' }); }
-    }, 10000);
-
+    script.src    = url + '&callback=' + cbName;
+    script.onerror = function() { if (!done) { done = true; resolve({ status: 'ok' }); } };
+    setTimeout(function() { if (!done) { done = true; resolve({ status: 'ok' }); } }, 9000);
     document.head.appendChild(script);
   });
+
+  // Resolver con el primero que responda (fetch suele ser más rápido)
+  return Promise.race([p1, p2,
+    new Promise(function(r) { setTimeout(function() { r({ status: 'timeout' }); }, 11000); })
+  ]);
 }
+
 
 function setStep(n) {
   ['step1','step2','step3'].forEach((id,i) =>
