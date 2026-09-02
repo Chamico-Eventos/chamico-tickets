@@ -787,33 +787,40 @@ async function confirmar() {
   setStep(3);
 }
 
-// Guarda la reserva — proxy Vercel (mismo dominio, sin bloqueos iOS)
+// Guarda la reserva: proxy para iOS, directo para desktop
 function saveViaScript(payload) {
-  var json = JSON.stringify(payload);
-  var saved = false;
+  var json       = JSON.stringify(payload);
+  var directUrl  = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
+  var isMobile   = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-  // Intento 1: proxy /api/save (mismo dominio → iOS nunca bloquea)
-  fetch('/api/save', {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    json,
-  }).then(function() {
-    saved = true;
-  }).catch(function() {});
+  if (isMobile) {
+    // iOS/Android → proxy Vercel (mismo dominio, sin bloqueos de Safari)
+    fetch('/api/save', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    json,
+    }).catch(function(e) { console.warn('[mobile save] ', e); });
 
-  // Intento 2: directo al Apps Script (backup para desktop si el proxy tarda)
-  // Solo dispara si el proxy no respondió en 2.5s — evita duplicados
-  setTimeout(function() {
-    if (!saved) {
-      try {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json), true);
-        xhr.send();
-      } catch(e) {}
-    }
-  }, 2500);
+  } else {
+    // Desktop → directo al Apps Script (más rápido, sin proxy)
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', directUrl, true);
+      xhr.onload  = function() {};
+      xhr.onerror = function() {};
+      xhr.send();
+    } catch(e) {}
 
-  // Mostrar pantalla de éxito sin esperar la red
+    // JSONP como segundo intento en desktop
+    try {
+      var sc = document.createElement('script');
+      sc.onerror = function() {};
+      sc.src = directUrl + '&cb=' + Date.now();
+      document.head.appendChild(sc);
+      setTimeout(function() { if (sc.parentNode) sc.parentNode.removeChild(sc); }, 5000);
+    } catch(e) {}
+  }
+
   return new Promise(function(resolve) {
     setTimeout(function() { resolve({ status: 'ok' }); }, 500);
   });
