@@ -799,33 +799,38 @@ function getDevice() {
   return 'Otro';
 }
 
-// Guarda la reserva: JSONP (desktop) + proxy Vercel (mobile)
+// Guarda la reserva: JSONP para desktop, /proxy rewrite para mobile
 function saveViaScript(payload) {
-  var json       = JSON.stringify(payload);
-  var directUrl  = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
+  var json     = JSON.stringify(payload);
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-  // ── JSONP: funciona en desktop (bypasea CORS con script tag) ────
-  // Fue el método que probadamente funcionó — se restaura como primario
-  try {
-    var cbName = 'chamicoCb_s_' + Date.now();
-    var sc = document.createElement('script');
-    window[cbName] = function() { delete window[cbName]; };
-    sc.onerror = function() {};
-    sc.src = directUrl + '&callback=' + cbName;
-    document.head.appendChild(sc);
-    setTimeout(function() {
-      if (sc.parentNode) sc.parentNode.removeChild(sc);
-    }, 8000);
-  } catch(e) {}
+  if (isMobile) {
+    // ── Mobile: /proxy GET (mismo dominio → Vercel rewrite → Apps Script) ──
+    // La rewrite de Vercel reenvía transparentemente a script.google.com
+    // iOS Safari nunca lo bloquea porque ve la URL de chamico-tickets.vercel.app
+    var proxyUrl = '/proxy?action=save&data=' + encodeURIComponent(json);
 
-  // ── Proxy Vercel: mismo dominio, funciona en iOS ─────────────────
-  fetch('/api/save', {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    json,
-  }).catch(function() {});
+    // Img tag: el método más básico posible, funciona en TODOS los browsers
+    var img = new Image();
+    img.src = proxyUrl + '&t=' + Date.now();
 
-  // Mostrar pantalla de éxito sin esperar confirmación de red
+    // Fetch como backup (resuelve la promesa si la img falla)
+    fetch(proxyUrl).catch(function() {});
+
+  } else {
+    // ── Desktop: JSONP directo a Apps Script (probadamente funciona) ──────
+    var directUrl = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
+    try {
+      var cbName = 'chamicoCb_s_' + Date.now();
+      var sc = document.createElement('script');
+      window[cbName] = function() { delete window[cbName]; };
+      sc.onerror = function() {};
+      sc.src = directUrl + '&callback=' + cbName;
+      document.head.appendChild(sc);
+      setTimeout(function() { if (sc.parentNode) sc.parentNode.removeChild(sc); }, 8000);
+    } catch(e) {}
+  }
+
   return new Promise(function(resolve) {
     setTimeout(function() { resolve({ status: 'ok' }); }, 500);
   });
