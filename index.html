@@ -799,26 +799,30 @@ function getDevice() {
   return 'Otro';
 }
 
-// Guarda la reserva: JSONP para desktop, /proxy rewrite para mobile
+// Guarda la reserva: JSONP desktop / función proxy mobile
 function saveViaScript(payload) {
   var json     = JSON.stringify(payload);
   var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   if (isMobile) {
-    // ── Mobile: /proxy GET (mismo dominio → Vercel rewrite → Apps Script) ──
-    // La rewrite de Vercel reenvía transparentemente a script.google.com
-    // iOS Safari nunca lo bloquea porque ve la URL de chamico-tickets.vercel.app
-    var proxyUrl = '/proxy?action=save&data=' + encodeURIComponent(json);
+    // Método 1: /api/save (función Vercel — sigue redirects server-side)
+    fetch('/api/save', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    json,
+    }).then(function(r) {
+      console.log('[mobile] /api/save status:', r.status);
+    }).catch(function(e) {
+      console.warn('[mobile] /api/save failed:', e);
+    });
 
-    // Img tag: el método más básico posible, funciona en TODOS los browsers
+    // Método 2: /proxy rewrite (backup si la función falla)
+    var proxyUrl = '/proxy?action=save&data=' + encodeURIComponent(json);
     var img = new Image();
     img.src = proxyUrl + '&t=' + Date.now();
 
-    // Fetch como backup (resuelve la promesa si la img falla)
-    fetch(proxyUrl).catch(function() {});
-
   } else {
-    // ── Desktop: JSONP directo a Apps Script (probadamente funciona) ──────
+    // Desktop: JSONP (probadamente funciona)
     var directUrl = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
     try {
       var cbName = 'chamicoCb_s_' + Date.now();
@@ -832,7 +836,7 @@ function saveViaScript(payload) {
   }
 
   return new Promise(function(resolve) {
-    setTimeout(function() { resolve({ status: 'ok' }); }, 500);
+    setTimeout(function() { resolve({ status: 'ok' }); }, 600);
   });
 }
 
