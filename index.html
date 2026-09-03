@@ -799,39 +799,33 @@ function getDevice() {
   return 'Otro';
 }
 
-// Guarda la reserva: proxy para iOS, directo para desktop
+// Guarda la reserva: JSONP (desktop) + proxy Vercel (mobile)
 function saveViaScript(payload) {
-  var json      = JSON.stringify(payload);
-  var directUrl = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
-  var isMobile  = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  var json       = JSON.stringify(payload);
+  var directUrl  = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
 
-  if (isMobile) {
-    // Móvil → proxy Vercel (mismo dominio) con fallback a directo
-    fetch('/api/save', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    json,
-    }).then(function(res) {
-      if (!res.ok) {
-        // Proxy respondió con error — intentar directo
-        var x = new XMLHttpRequest();
-        x.open('GET', directUrl, true); x.send();
-      }
-    }).catch(function() {
-      // Proxy inalcanzable — intentar directo
-      try { var x = new XMLHttpRequest(); x.open('GET', directUrl, true); x.send(); } catch(e) {}
-    });
+  // ── JSONP: funciona en desktop (bypasea CORS con script tag) ────
+  // Fue el método que probadamente funcionó — se restaura como primario
+  try {
+    var cbName = 'chamicoCb_s_' + Date.now();
+    var sc = document.createElement('script');
+    window[cbName] = function() { delete window[cbName]; };
+    sc.onerror = function() {};
+    sc.src = directUrl + '&callback=' + cbName;
+    document.head.appendChild(sc);
+    setTimeout(function() {
+      if (sc.parentNode) sc.parentNode.removeChild(sc);
+    }, 8000);
+  } catch(e) {}
 
-  } else {
-    // Desktop → XHR directo (una sola llamada, sin duplicados)
-    try {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', directUrl, true);
-      xhr.onload = xhr.onerror = function() {};
-      xhr.send();
-    } catch(e) {}
-  }
+  // ── Proxy Vercel: mismo dominio, funciona en iOS ─────────────────
+  fetch('/api/save', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    json,
+  }).catch(function() {});
 
+  // Mostrar pantalla de éxito sin esperar confirmación de red
   return new Promise(function(resolve) {
     setTimeout(function() { resolve({ status: 'ok' }); }, 500);
   });
