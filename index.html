@@ -777,6 +777,7 @@ async function confirmar() {
     'Evento':            CFG.eventName,
     'Fecha del evento':  CFG.eventDateFormatted,
     'Venue':             CFG.venue,
+    'Dispositivo':       getDevice(),
     'Tipo':              'Preventa',
   };
   try {
@@ -787,37 +788,47 @@ async function confirmar() {
   setStep(3);
 }
 
+// Detecta el dispositivo del usuario para tracking
+function getDevice() {
+  var ua = navigator.userAgent;
+  if (/iPhone/.test(ua))  return 'iPhone iOS ' + ((/OS ([\d_]+)/.exec(ua)||['','?'])[1].replace(/_/g,'.'));
+  if (/iPad/.test(ua))    return 'iPad iOS '   + ((/OS ([\d_]+)/.exec(ua)||['','?'])[1].replace(/_/g,'.'));
+  if (/Android/.test(ua)) return 'Android';
+  if (/Windows/.test(ua)) return 'Windows PC';
+  if (/Mac/.test(ua))     return 'Mac';
+  return 'Otro';
+}
+
 // Guarda la reserva: proxy para iOS, directo para desktop
 function saveViaScript(payload) {
-  var json       = JSON.stringify(payload);
-  var directUrl  = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
-  var isMobile   = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  var json      = JSON.stringify(payload);
+  var directUrl = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
+  var isMobile  = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   if (isMobile) {
-    // iOS/Android → proxy Vercel (mismo dominio, sin bloqueos de Safari)
+    // Móvil → proxy Vercel (mismo dominio) con fallback a directo
     fetch('/api/save', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    json,
-    }).catch(function(e) { console.warn('[mobile save] ', e); });
+    }).then(function(res) {
+      if (!res.ok) {
+        // Proxy respondió con error — intentar directo
+        var x = new XMLHttpRequest();
+        x.open('GET', directUrl, true); x.send();
+      }
+    }).catch(function() {
+      // Proxy inalcanzable — intentar directo
+      try { var x = new XMLHttpRequest(); x.open('GET', directUrl, true); x.send(); } catch(e) {}
+    });
 
   } else {
-    // Desktop → directo al Apps Script (más rápido, sin proxy)
+    // Desktop → XHR directo (una sola llamada, sin duplicados)
     try {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', directUrl, true);
-      xhr.onload  = function() {};
-      xhr.onerror = function() {};
+      xhr.onload = xhr.onerror = function() {};
       xhr.send();
-    } catch(e) {}
-
-    // JSONP como segundo intento en desktop
-    try {
-      var sc = document.createElement('script');
-      sc.onerror = function() {};
-      sc.src = directUrl + '&cb=' + Date.now();
-      document.head.appendChild(sc);
-      setTimeout(function() { if (sc.parentNode) sc.parentNode.removeChild(sc); }, 5000);
     } catch(e) {}
   }
 
