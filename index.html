@@ -799,41 +799,25 @@ function getDevice() {
   return 'Otro';
 }
 
-// Guarda la reserva: múltiples métodos en orden de confiabilidad
+// Guarda la reserva: sendBeacon → /api/save (funciona en todos los dispositivos)
 function saveViaScript(payload) {
   var json = JSON.stringify(payload);
 
-  // ── Método 1: sendBeacon → /api/save (el más confiable en mobile) ─────────
-  // sendBeacon es POST nativo del browser, no puede ser bloqueado ni cancelado
-  // Disponible en iOS 11.3+, Android, todos los browsers modernos
+  // sendBeacon es POST nativo del browser — un solo envío, sin duplicados
+  // Funciona en iOS 11.3+, Android, desktop — no puede ser bloqueado
   try {
     var blob = new Blob([json], { type: 'application/json' });
     var sent = navigator.sendBeacon('/api/save', blob);
-    console.log('[save] sendBeacon:', sent ? 'queued' : 'failed');
+    if (!sent) throw new Error('sendBeacon returned false');
   } catch(e) {
-    console.warn('[save] sendBeacon error:', e);
+    // Fallback: XHR POST (por si sendBeacon falla en algún browser muy viejo)
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/save', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(json);
+    } catch(e2) {}
   }
-
-  // ── Método 2: XHR POST → /api/save (backup si sendBeacon no disponible) ──
-  try {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/save', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = xhr.onerror = function() {};
-    xhr.send(json);
-  } catch(e) {}
-
-  // ── Método 3: JSONP directo a Apps Script (funciona bien en desktop) ──────
-  var directUrl = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
-  try {
-    var cbName = 'chamicoCb_s_' + Date.now();
-    var sc = document.createElement('script');
-    window[cbName] = function() { delete window[cbName]; };
-    sc.onerror = function() {};
-    sc.src = directUrl + '&callback=' + cbName;
-    document.head.appendChild(sc);
-    setTimeout(function() { if (sc.parentNode) sc.parentNode.removeChild(sc); }, 8000);
-  } catch(e) {}
 
   return new Promise(function(resolve) {
     setTimeout(function() { resolve({ status: 'ok' }); }, 600);
