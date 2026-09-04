@@ -799,41 +799,32 @@ function getDevice() {
   return 'Otro';
 }
 
-// Guarda la reserva: JSONP desktop / función proxy mobile
+// Guarda la reserva: /api/save (todos los dispositivos) + JSONP (backup desktop)
 function saveViaScript(payload) {
-  var json     = JSON.stringify(payload);
-  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  var json = JSON.stringify(payload);
 
-  if (isMobile) {
-    // Método 1: /api/save (función Vercel — sigue redirects server-side)
-    fetch('/api/save', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    json,
-    }).then(function(r) {
-      console.log('[mobile] /api/save status:', r.status);
-    }).catch(function(e) {
-      console.warn('[mobile] /api/save failed:', e);
-    });
-
-    // Método 2: /proxy rewrite (backup si la función falla)
-    var proxyUrl = '/proxy?action=save&data=' + encodeURIComponent(json);
+  // ── Método 1: img tag a /api/save (mismo dominio, GET, funciona en TODO) ──
+  // La función Vercel en /api/save reenvía a Apps Script server-side
+  // iOS Safari no puede bloquear un GET a su mismo dominio
+  try {
     var img = new Image();
-    img.src = proxyUrl + '&t=' + Date.now();
+    img.src = '/api/save?data=' + encodeURIComponent(json) + '&t=' + Date.now();
+    img.onerror = img.onload = function(){};
+    document.body.appendChild(img);
+    setTimeout(function() { if (img.parentNode) img.parentNode.removeChild(img); }, 5000);
+  } catch(e) {}
 
-  } else {
-    // Desktop: JSONP (probadamente funciona)
-    var directUrl = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
-    try {
-      var cbName = 'chamicoCb_s_' + Date.now();
-      var sc = document.createElement('script');
-      window[cbName] = function() { delete window[cbName]; };
-      sc.onerror = function() {};
-      sc.src = directUrl + '&callback=' + cbName;
-      document.head.appendChild(sc);
-      setTimeout(function() { if (sc.parentNode) sc.parentNode.removeChild(sc); }, 8000);
-    } catch(e) {}
-  }
+  // ── Método 2: JSONP directo (backup, funciona bien en desktop) ────────────
+  var directUrl = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
+  try {
+    var cbName = 'chamicoCb_s_' + Date.now();
+    var sc = document.createElement('script');
+    window[cbName] = function() { delete window[cbName]; };
+    sc.onerror = function() {};
+    sc.src = directUrl + '&callback=' + cbName;
+    document.head.appendChild(sc);
+    setTimeout(function() { if (sc.parentNode) sc.parentNode.removeChild(sc); }, 8000);
+  } catch(e) {}
 
   return new Promise(function(resolve) {
     setTimeout(function() { resolve({ status: 'ok' }); }, 600);
