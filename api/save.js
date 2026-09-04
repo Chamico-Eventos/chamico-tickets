@@ -49,8 +49,14 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    var body = req.body || {};
-    var data = typeof body === 'string' ? body : JSON.stringify(body);
+    // Support both GET (query param) and POST (body)
+    var data;
+    if (req.method === 'GET' && req.query && req.query.data) {
+      data = req.query.data;
+    } else {
+      var body = req.body || {};
+      data = typeof body === 'string' ? body : JSON.stringify(body);
+    }
     var url  = SHEET_URL + '?action=save&data=' + encodeURIComponent(data);
     console.log('[proxy] starting, data length:', data.length, 'method:', req.method);
     var result = await get(url);
