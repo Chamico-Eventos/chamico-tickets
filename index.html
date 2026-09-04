@@ -799,22 +799,31 @@ function getDevice() {
   return 'Otro';
 }
 
-// Guarda la reserva: /api/save (todos los dispositivos) + JSONP (backup desktop)
+// Guarda la reserva: múltiples métodos en orden de confiabilidad
 function saveViaScript(payload) {
   var json = JSON.stringify(payload);
 
-  // ── Método 1: img tag a /api/save (mismo dominio, GET, funciona en TODO) ──
-  // La función Vercel en /api/save reenvía a Apps Script server-side
-  // iOS Safari no puede bloquear un GET a su mismo dominio
+  // ── Método 1: sendBeacon → /api/save (el más confiable en mobile) ─────────
+  // sendBeacon es POST nativo del browser, no puede ser bloqueado ni cancelado
+  // Disponible en iOS 11.3+, Android, todos los browsers modernos
   try {
-    var img = new Image();
-    img.src = '/api/save?data=' + encodeURIComponent(json) + '&t=' + Date.now();
-    img.onerror = img.onload = function(){};
-    document.body.appendChild(img);
-    setTimeout(function() { if (img.parentNode) img.parentNode.removeChild(img); }, 5000);
+    var blob = new Blob([json], { type: 'application/json' });
+    var sent = navigator.sendBeacon('/api/save', blob);
+    console.log('[save] sendBeacon:', sent ? 'queued' : 'failed');
+  } catch(e) {
+    console.warn('[save] sendBeacon error:', e);
+  }
+
+  // ── Método 2: XHR POST → /api/save (backup si sendBeacon no disponible) ──
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/save', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = xhr.onerror = function() {};
+    xhr.send(json);
   } catch(e) {}
 
-  // ── Método 2: JSONP directo (backup, funciona bien en desktop) ────────────
+  // ── Método 3: JSONP directo a Apps Script (funciona bien en desktop) ──────
   var directUrl = CFG.sheetUrl + '?action=save&data=' + encodeURIComponent(json);
   try {
     var cbName = 'chamicoCb_s_' + Date.now();
