@@ -11,6 +11,19 @@
 // ═══════════════════════════════════════════════════════════════
 
 
+// ── VOZ DEL PORTAL ─────────────────────────────────────────────
+// Frase que aparece debajo de "Entradas Online", en el catálogo.
+// Tono amable — la que ve todo el mundo, incluidos venues nuevos.
+// Podés poner un string, o un array y va rotando en cada carga.
+const PORTAL = {
+  tagline: '¿Qué estás esperando? No dejes que te arruinen el finde con planes aburridos.',
+
+  // Otras opciones probadas:
+  // '¿Qué estás esperando?'
+  // 'El finde es corto. No lo gastes en el sillón.'
+};
+
+
 // ── VENUES ─────────────────────────────────────────────────────
 // Agregar un venue nuevo = agregar una entrada acá.
 const VENUES = {
@@ -19,6 +32,11 @@ const VENUES = {
     mapsLink:   'https://maps.app.goo.gl/H5viHN4ZsEAJGFtv9',
     logo:       'assets/venue-chamico.png',
     maxTickets: 350,                       // capacidad del venue
+
+    // Frase por defecto del venue. La usa cualquier evento de este
+    // venue que no traiga su propia `tagline`. Dejala en '' si el
+    // venue prefiere el portal sin voz.
+    tagline:    '',
   },
 };
 
@@ -47,6 +65,10 @@ const EVENTS = withDefaults([
       'assets/events/gato-abuela-031026-b.jpg',
     ],
     imageLeftContain: true,   // la imagen izquierda se muestra entera, sin recortar
+
+    // Frase del evento — sale debajo del título, solo en el catálogo.
+    // Puede ser un array y rota sola en cada carga.
+    tagline: 'Dejá de flamear aura y vení a flamear rock.',
   },
 
   {
@@ -60,6 +82,8 @@ const EVENTS = withDefaults([
       'assets/events/alambre-mental-311026-a.jpg',
       'assets/events/alambre-mental-311026-b.jpg',
     ],
+
+    tagline: 'No dejes que te coman los gusanos, vení a vivir blues y un poco de fusión.',
   },
 
 ]);
@@ -83,6 +107,7 @@ function withDefaults(list) {
       mapsLink:   v.mapsLink,
       venueLogo:  v.logo,
       maxTickets: v.maxTickets,
+      tagline:    v.tagline,        // el evento la pisa si trae la suya
     }, ev, {
       dateSort:      d,
       dateFormatted: p[1] + '/' + p[2] + '/' + p[0],   // mm/dd/yyyy para el sheet
