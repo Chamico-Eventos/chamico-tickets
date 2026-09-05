@@ -164,7 +164,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .ev-card-img-half{flex:1;background-size:cover;background-position:center}
 .ev-card-body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
 .ev-venue{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.ev-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--ink);margin:0 0 8px;line-height:1.25}
+.ev-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--ink);margin:0 0 6px;line-height:1.25}
+.ev-tagline{font-size:13px;font-style:italic;color:var(--gold2);opacity:.82;margin:0 0 10px;line-height:1.45}
+.portal-tagline{font-size:14px;font-style:italic;color:var(--ink2);opacity:.9;line-height:1.5;max-width:420px;margin:0 auto 24px}
 .ev-date{font-size:12px;color:var(--ink2);margin:0 0 12px;display:flex;align-items:center;gap:6px}
 .ev-date::before{content:'';display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
 .ev-price-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
@@ -192,7 +194,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
     <span class="venue-name">Areco · Próximos Eventos</span>
     <div class="venue-line"></div>
   </div>
-  <h1 style="font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,48px);font-weight:700;color:var(--ink);margin:0 0 24px;font-style:italic">Entradas Online</h1>
+  <h1 style="font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,48px);font-weight:700;color:var(--ink);margin:0 0 12px;font-style:italic">Entradas Online</h1>
+  <p class="portal-tagline" id="portalTagline"></p>
   <div style="display:inline-flex;align-items:center;gap:10px;opacity:.65">
     <span style="font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#6b6150">Powered by</span>
     <img src="assets/datamaniacs.png" style="height:90px;width:auto;display:block" alt="DataManIAcs">
@@ -389,6 +392,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 
 // ── CATALOG: render cards ──────────────────────────────────────
 function renderCatalog() {
+  renderPortalTagline();
   var sorted = EVENTS.slice().sort(function(a,b){ return a.dateSort - b.dateSort; });
   var grid = document.getElementById('events-grid');
     grid.innerHTML = sorted.map(createEventCard).join('');
@@ -422,6 +426,25 @@ function renderCatalog() {
   });
 }
 
+// ── VOZ: frases del portal y de cada evento ─────────────────────
+// `tagline` puede ser un string o un array. Si es array, se elige una
+// al azar en cada carga, así el catálogo no dice siempre lo mismo.
+// Solo aparecen en el catálogo — nunca en las pantallas de pago.
+function pickTagline(ev) {
+  var t = ev.tagline;
+  if (!t) return '';
+  if (Array.isArray(t)) return t.length ? t[Math.floor(Math.random() * t.length)] : '';
+  return t;
+}
+
+function renderPortalTagline() {
+  var el = document.getElementById('portalTagline');
+  if (!el) return;
+  var t = (typeof PORTAL !== 'undefined') ? PORTAL.tagline : '';
+  if (Array.isArray(t)) t = t.length ? t[Math.floor(Math.random() * t.length)] : '';
+  if (t) el.textContent = t; else el.style.display = 'none';
+}
+
 // ── CATALOG: create one event card ──────────────────────────────
 function createEventCard(ev) {
   var imgHtml = ev.images.length === 1
@@ -437,6 +460,7 @@ function createEventCard(ev) {
     '<span class="ev-venue" style="margin-bottom:0">' + ev.venue + (ev.city ? ' \u00b7 ' + ev.city : '') + '</span>' +
     '</div>' +
     '<h2 class="ev-name">' + ev.name + '</h2>' +
+    (pickTagline(ev) ? '<p class="ev-tagline">' + pickTagline(ev) + '</p>' : '') +
     '<p class="ev-date">' + ev.dateDisplay + '</p>' +
     '<div class="ev-price-row">' +
       '<span class="ev-price">$' + ev.price.toLocaleString('es-AR') + '</span>' +
