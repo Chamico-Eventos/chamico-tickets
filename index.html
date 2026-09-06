@@ -164,9 +164,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .ev-card-img-half{flex:1;background-size:cover;background-position:center}
 .ev-card-body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
 .ev-venue{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.ev-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--ink);margin:0 0 6px;line-height:1.25}
-.ev-tagline{font-size:13px;font-style:italic;color:var(--gold2);opacity:.82;margin:0 0 10px;line-height:1.45}
-.portal-tagline{font-size:14px;font-style:italic;color:var(--ink2);opacity:.9;line-height:1.5;max-width:420px;margin:0 auto 24px}
+.ev-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--ink);margin:0 0 8px;line-height:1.25}
 .ev-date{font-size:12px;color:var(--ink2);margin:0 0 12px;display:flex;align-items:center;gap:6px}
 .ev-date::before{content:'';display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
 .ev-price-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
@@ -194,8 +192,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
     <span class="venue-name">Areco · Próximos Eventos</span>
     <div class="venue-line"></div>
   </div>
-  <h1 style="font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,48px);font-weight:700;color:var(--ink);margin:0 0 12px;font-style:italic">Entradas Online</h1>
-  <p class="portal-tagline" id="portalTagline"></p>
+  <h1 style="font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,48px);font-weight:700;color:var(--ink);margin:0 0 24px;font-style:italic">Entradas Online</h1>
   <div style="display:inline-flex;align-items:center;gap:10px;opacity:.65">
     <span style="font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#6b6150">Powered by</span>
     <img src="assets/datamaniacs.png" style="height:90px;width:auto;display:block" alt="DataManIAcs">
@@ -281,8 +278,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
     </div>
     <div class="field-group">
       <label class="field-label" for="f-dni">DNI *</label>
-      <input type="text" class="field-input" id="f-dni" placeholder="12.345.678" inputmode="numeric">
-      <div class="field-error" id="e-dni">Ingresá tu DNI</div>
+      <input type="text" class="field-input" id="f-dni" placeholder="12345678" inputmode="numeric" maxlength="8" autocomplete="off" oninput="this.value=this.value.replace(/[^0-9]/g,'');dniFeedback()" onblur="dniFeedback()">
+      <div id="dni-feedback" style="font-size:11px;color:var(--muted);margin-top:4px;min-height:15px;font-style:italic;transition:color 0.2s"></div>
+      <div class="field-error" id="e-dni">Ingresá un DNI válido (7 u 8 dígitos)</div>
     </div>
   </div>
 
@@ -392,7 +390,6 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 
 // ── CATALOG: render cards ──────────────────────────────────────
 function renderCatalog() {
-  renderPortalTagline();
   var sorted = EVENTS.slice().sort(function(a,b){ return a.dateSort - b.dateSort; });
   var grid = document.getElementById('events-grid');
     grid.innerHTML = sorted.map(createEventCard).join('');
@@ -426,25 +423,6 @@ function renderCatalog() {
   });
 }
 
-// ── VOZ: frases del portal y de cada evento ─────────────────────
-// `tagline` puede ser un string o un array. Si es array, se elige una
-// al azar en cada carga, así el catálogo no dice siempre lo mismo.
-// Solo aparecen en el catálogo — nunca en las pantallas de pago.
-function pickTagline(ev) {
-  var t = ev.tagline;
-  if (!t) return '';
-  if (Array.isArray(t)) return t.length ? t[Math.floor(Math.random() * t.length)] : '';
-  return t;
-}
-
-function renderPortalTagline() {
-  var el = document.getElementById('portalTagline');
-  if (!el) return;
-  var t = (typeof PORTAL !== 'undefined') ? PORTAL.tagline : '';
-  if (Array.isArray(t)) t = t.length ? t[Math.floor(Math.random() * t.length)] : '';
-  if (t) el.textContent = t; else el.style.display = 'none';
-}
-
 // ── CATALOG: create one event card ──────────────────────────────
 function createEventCard(ev) {
   var imgHtml = ev.images.length === 1
@@ -460,7 +438,6 @@ function createEventCard(ev) {
     '<span class="ev-venue" style="margin-bottom:0">' + ev.venue + (ev.city ? ' \u00b7 ' + ev.city : '') + '</span>' +
     '</div>' +
     '<h2 class="ev-name">' + ev.name + '</h2>' +
-    (pickTagline(ev) ? '<p class="ev-tagline">' + pickTagline(ev) + '</p>' : '') +
     '<p class="ev-date">' + ev.dateDisplay + '</p>' +
     '<div class="ev-price-row">' +
       '<span class="ev-price">$' + ev.price.toLocaleString('es-AR') + '</span>' +
@@ -674,13 +651,44 @@ function telFeedback() {
   }
 }
 
+// El DNI argentino tiene 7 u 8 dígitos y NO tiene dígito verificador
+// (eso es el CUIT). Lo único chequeable es el largo y que no sea basura.
+// Ojo: 12345678 es un DNI plausible, así que no se rechazan secuencias.
+// Se guarda siempre en dígitos pelados, sin puntos.
+function dniOk(v) {
+  var d = String(v || '').replace(/\D/g, '');
+  return (d.length === 7 || d.length === 8) && !/^(\d)\1+$/.test(d);
+}
+
+function dniFeedback() {
+  var input = document.getElementById('f-dni');
+  var fb    = document.getElementById('dni-feedback');
+  if (!input || !fb) return;
+  var d = input.value.replace(/\D/g, '').slice(0, 8);
+  input.value = d;
+  if (d.length === 0) {
+    fb.textContent = '';
+  } else if (d.length < 7) {
+    fb.style.color = 'var(--danger)';
+    fb.textContent = d.length + ' / 7 dígitos mínimo';
+  } else if (/^(\d)\1+$/.test(d)) {
+    fb.style.color = 'var(--danger)';
+    fb.textContent = 'Revisá el número';
+  } else {
+    fb.style.color = 'var(--green)';
+    fb.textContent = '✓ Listo';
+    input.classList.remove('err');
+    document.getElementById('e-dni').classList.remove('show');
+  }
+}
+
 function validate() {
   const rules = [
     {id:'f-nombre',   err:'e-nombre',   ok: v => v.trim().length > 1},
     {id:'f-apellido', err:'e-apellido', ok: v => v.trim().length > 1},
     {id:'f-email',    err:'e-email',    ok: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)},
     {id:'f-tel',      err:'e-tel',      ok: v => v.replace(/[^0-9]/g,'').length === 10},
-    {id:'f-dni',      err:'e-dni',      ok: v => v.replace(/\D/g,'').length >= 7},
+    {id:'f-dni',      err:'e-dni',      ok: v => dniOk(v)},
   ];
   let valid = true;
   rules.forEach(r => {
@@ -701,7 +709,7 @@ function goStep2() {
     apellido: document.getElementById('f-apellido').value.trim(),
     email:    document.getElementById('f-email').value.trim(),
     tel:      document.getElementById('f-tel').value.trim(),
-    dni:      document.getElementById('f-dni').value.trim(),
+    dni:      document.getElementById('f-dni').value.replace(/\D/g, ''),
     qty, total:    qty * CFG.price,
   };
   document.getElementById('s-nombre').textContent  = user.nombre + ' ' + user.apellido;
