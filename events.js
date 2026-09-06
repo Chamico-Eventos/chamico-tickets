@@ -55,7 +55,7 @@ const EVENTS = withDefaults([
 
   {
     id:          'gato-abuela-031026',
-    name:        'El Gato de la Abuela & José Luis Arriola',
+    name:        'Rock&Pizza: El Gato de la Abuela & José Luis Arriola',
     venue:       'Galpón Chamico',
     date:        '2026-10-03',                        // YYYY-MM-DD
     dateDisplay: 'Viernes 3 de Octubre · 23:00 hs',
@@ -73,7 +73,7 @@ const EVENTS = withDefaults([
 
   {
     id:          'alambre-mental-311026',
-    name:        'Alambre Gonzáles & Mental Delta',
+    name:        'Alambre Gonzáles & Mental Delta & TomGi DJ',
     venue:       'Galpón Chamico',
     date:        '2026-10-31',
     dateDisplay: 'Sábado 31 de Octubre · 20:30 hs (Puntual)',
