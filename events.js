@@ -73,10 +73,10 @@ const EVENTS = withDefaults([
 
   {
     id:          'alambre-mental-311026',
-    name:        'Alambre Gonzáles & Mental Delta & TomGi DJ',
+    name:        'Alambre González & Mental Delta & TomGi DJ',
     venue:       'Galpón Chamico',
     date:        '2026-10-31',
-    dateDisplay: 'Sábado 31 de Octubre · 20:30 hs (Puntual)',
+    dateDisplay: 'Sábado 31 de Octubre · Puertas 20:30 · Show 21:00 hs (Puntual)',
     price:       25000,
     images: [
       'assets/events/alambre-mental-311026-a.jpg',
