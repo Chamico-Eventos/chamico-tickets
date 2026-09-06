@@ -58,7 +58,7 @@ const EVENTS = withDefaults([
     name:        'Rock&Pizza: El Gato de la Abuela & José Luis Arriola',
     venue:       'Galpón Chamico',
     date:        '2026-10-03',                        // YYYY-MM-DD
-    dateDisplay: 'Viernes 3 de Octubre · 23:00 hs',
+    dateDisplay: 'Sábado 3 de Octubre · 23:00 hs',
     price:       15000,                               // por entrada
     images: [
       'assets/events/gato-abuela-031026-a.jpg',
