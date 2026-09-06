@@ -164,7 +164,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .ev-card-img-half{flex:1;background-size:cover;background-position:center}
 .ev-card-body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
 .ev-venue{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.ev-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--ink);margin:0 0 8px;line-height:1.25}
+.ev-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--ink);margin:0 0 6px;line-height:1.25}
+.ev-tagline{font-size:12.5px;color:var(--muted);font-style:italic;line-height:1.45;margin:0 0 10px}
 .ev-date{font-size:12px;color:var(--ink2);margin:0 0 12px;display:flex;align-items:center;gap:6px}
 .ev-date::before{content:'';display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
 .ev-price-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
@@ -192,7 +193,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
     <span class="venue-name">Areco · Próximos Eventos</span>
     <div class="venue-line"></div>
   </div>
-  <h1 style="font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,48px);font-weight:700;color:var(--ink);margin:0 0 24px;font-style:italic">Entradas Online</h1>
+  <h1 style="font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,48px);font-weight:700;color:var(--ink);margin:0 0 14px;font-style:italic">Entradas Online</h1>
+  <p id="portal-tagline" style="font-size:13.5px;color:var(--muted);font-style:italic;line-height:1.5;margin:0 auto 24px;max-width:440px;display:none"></p>
   <div style="display:inline-flex;align-items:center;gap:10px;opacity:.65">
     <span style="font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#6b6150">Powered by</span>
     <img src="assets/datamaniacs.png" style="height:90px;width:auto;display:block" alt="DataManIAcs">
@@ -390,6 +392,15 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 
 // ── CATALOG: render cards ──────────────────────────────────────
 function renderCatalog() {
+  // Frase del portal, debajo de "Entradas Online". Solo en el catálogo.
+  // Si PORTAL no existe o está vacío, el <p> queda oculto y no deja hueco.
+  var pt = document.getElementById('portal-tagline');
+  if (pt) {
+    var frase = (typeof PORTAL !== 'undefined') ? pickTagline(PORTAL.tagline) : '';
+    pt.textContent   = frase;
+    pt.style.display = frase ? 'block' : 'none';
+  }
+
   var sorted = EVENTS.slice().sort(function(a,b){ return a.dateSort - b.dateSort; });
   var grid = document.getElementById('events-grid');
     grid.innerHTML = sorted.map(createEventCard).join('');
@@ -423,8 +434,16 @@ function renderCatalog() {
   });
 }
 
+// Una frase puede ser un string o un array (rota en cada carga).
+// Devuelve '' si no hay nada, así el elemento ni se dibuja.
+function pickTagline(t) {
+  if (Array.isArray(t)) return t.length ? t[Math.floor(Math.random() * t.length)] : '';
+  return t ? String(t) : '';
+}
+
 // ── CATALOG: create one event card ──────────────────────────────
 function createEventCard(ev) {
+  var tag = pickTagline(ev.tagline);
   var imgHtml = ev.images.length === 1
     ? '<div class="ev-card-img-half" style="background-image:url(\'' + ev.images[0] + '\');background-size:' + (ev.imageContain ? 'contain' : 'cover') + ';background-repeat:no-repeat;background-color:#0e0d0b;flex:1"></div>'
     : '<div class="ev-card-img-half" style="background-image:url(\'' + ev.images[0] + '\')"></div>' +
@@ -438,6 +457,7 @@ function createEventCard(ev) {
     '<span class="ev-venue" style="margin-bottom:0">' + ev.venue + (ev.city ? ' \u00b7 ' + ev.city : '') + '</span>' +
     '</div>' +
     '<h2 class="ev-name">' + ev.name + '</h2>' +
+    (tag ? '<p class="ev-tagline">' + tag + '</p>' : '') +
     '<p class="ev-date">' + ev.dateDisplay + '</p>' +
     '<div class="ev-price-row">' +
       '<span class="ev-price">$' + ev.price.toLocaleString('es-AR') + '</span>' +
