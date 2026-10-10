@@ -44,7 +44,6 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .avail-bar-track{height:5px;background:rgba(255,255,255,0.07);border-radius:999px;overflow:hidden}
 .avail-bar-fill{height:100%;border-radius:999px;transition:width 0.6s ease,background 0.4s}
 .avail-sub{font-size:11px;color:var(--muted);margin-top:6px}
-/* loading shimmer */
 .avail-loading{animation:shimmer 1.4s ease-in-out infinite}
 @keyframes shimmer{0%,100%{opacity:0.4}50%{opacity:1}}
 
@@ -70,6 +69,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .field-error{font-size:12px;color:var(--danger);margin-top:4px;display:none;font-style:italic}
 .field-error.show{display:block}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 
 /* TICKET COUNTER */
 .ticket-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:18px;margin-bottom:20px}
@@ -89,6 +89,56 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .total-label{font-size:14px;color:var(--ink2);font-weight:600}
 .total-value{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--gold2);letter-spacing:-0.02em}
 
+/* ── ATTENDEE SLOTS ─────────────────────────────────────────────── */
+#attendees-section{margin-bottom:20px}
+.attendees-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.attendees-header-line{flex:1;height:1px;background:var(--border2)}
+.attendees-header-label{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+
+.attendee-card{
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:var(--rlg);
+  padding:16px;
+  margin-bottom:10px;
+  transition:border-color 0.2s;
+}
+.attendee-card.ticket-1{
+  border-color:rgba(201,168,76,0.3);
+  background:linear-gradient(135deg,rgba(201,168,76,0.05),transparent);
+}
+.attendee-card.has-error{border-color:var(--danger)}
+
+.attendee-card-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+.attendee-ticket-label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  font-weight:600;
+  color:var(--ink2);
+}
+.attendee-ticket-num{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--gold-dim);border:1px solid rgba(201,168,76,0.25);
+  color:var(--gold);font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.attendee-ticket-num.num-1{background:var(--gold-dim);border-color:rgba(201,168,76,0.4);color:var(--gold2)}
+.attendee-you-badge{
+  font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  background:rgba(62,201,124,0.12);border:1px solid rgba(62,201,124,0.3);
+  color:var(--green);border-radius:999px;padding:2px 8px;
+}
+.attendee-optional-badge{
+  font-size:9px;color:var(--muted);font-style:italic;
+}
+
 /* BUTTONS */
 .btn-primary{width:100%;padding:16px;border-radius:var(--r);border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0e0d0b;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.02em;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
 .btn-primary:hover{filter:brightness(1.06);transform:translateY(-1px)}
@@ -104,6 +154,19 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .pay-detail{font-size:13px;color:var(--muted)}
 .pay-total{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;color:var(--gold2);letter-spacing:-0.03em;margin:10px 0 2px;line-height:1}
 .pay-total-sub{font-size:12px;color:var(--muted)}
+
+/* Step 2: attendee summary list */
+.attendee-summary-list{
+  display:flex;flex-direction:column;gap:6px;
+  margin-top:10px;
+}
+.attendee-summary-item{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,0.03);border:1px solid var(--border2);
+  border-radius:var(--r);padding:9px 12px;font-size:13px;
+}
+.attendee-summary-name{color:var(--ink2);font-weight:500}
+.attendee-summary-dni{color:var(--muted);font-size:12px;font-family:'Inter',monospace}
 
 .alias-box{background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.04));border:1px solid rgba(201,168,76,0.5);border-radius:var(--rlg);padding:20px;margin-bottom:14px;text-align:center}
 .alias-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:8px}
@@ -151,7 +214,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .overlay p{font-size:13px;color:var(--muted)}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-@media(max-width:480px){.row2{grid-template-columns:1fr}}
+@media(max-width:480px){.row2{grid-template-columns:1fr}.row3{grid-template-columns:1fr 1fr}}
 
 /* ─── CATALOG VIEW ─────────────────────────────────────────────── */
 #view-catalog{min-height:100vh}
@@ -186,28 +249,29 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
   <p>Guardando tu reserva…</p>
 </div>
 
+<!-- ─── CATALOG ──────────────────────────────────────────────────── -->
 <div id="view-catalog">
   <header class="cat-header" style="padding:40px 24px 32px">
-  <div class="venue-eyebrow" style="margin-bottom:16px">
-    <div class="venue-line"></div>
-    <span class="venue-name">Areco · Próximos Eventos</span>
-    <div class="venue-line"></div>
-  </div>
-  <h1 style="font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,48px);font-weight:700;color:var(--ink);margin:0 0 14px;font-style:italic">Entradas Online</h1>
-  <p id="portal-tagline" style="font-size:13.5px;color:var(--muted);font-style:italic;line-height:1.5;margin:0 auto 24px;max-width:440px;display:none"></p>
-  <div style="display:inline-flex;align-items:center;gap:10px;opacity:.65">
-    <span style="font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#6b6150">Powered by</span>
-    <img src="assets/datamaniacs.png" style="height:90px;width:auto;display:block" alt="DataManIAcs">
-  </div>
-</header>
+    <div class="venue-eyebrow" style="margin-bottom:16px">
+      <div class="venue-line"></div>
+      <span class="venue-name">Areco · Próximos Eventos</span>
+      <div class="venue-line"></div>
+    </div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,48px);font-weight:700;color:var(--ink);margin:0 0 14px;font-style:italic">Entradas Online</h1>
+    <p id="portal-tagline" style="font-size:13.5px;color:var(--muted);font-style:italic;line-height:1.5;margin:0 auto 24px;max-width:440px;display:none"></p>
+    <div style="display:inline-flex;align-items:center;gap:10px;opacity:.65">
+      <span style="font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#6b6150">Powered by</span>
+      <img src="assets/datamaniacs.png" style="height:90px;width:auto;display:block" alt="DataManIAcs">
+    </div>
+  </header>
   <div class="events-grid" id="events-grid"></div>
 </div>
 
+<!-- ─── EVENT VIEW ───────────────────────────────────────────────── -->
 <div id="view-event" style="display:none">
 
 <button class="back-btn" onclick="showCatalog()">← Todos los eventos</button>
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-inner">
     <img class="header-logo" src="assets/chamico-logo.png" alt="El Chamico">
@@ -224,14 +288,13 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
   </div>
 </header>
 
-<!-- PROGRESS DOTS -->
 <div class="progress-dots" id="progressDots">
   <div class="dot active" id="d1"></div>
   <div class="dot" id="d2"></div>
   <div class="dot" id="d3"></div>
 </div>
 
-<!-- SOLD OUT SCREEN (hidden by default) -->
+<!-- SOLD OUT -->
 <div class="sold-out" id="soldOut">
   <div class="so-icon">🎟</div>
   <div class="so-title">Preventa <em>agotada</em></div>
@@ -244,20 +307,22 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
   </div>
 </div>
 
-<!-- STEP 1: DATOS -->
+<!-- ═══ STEP 1: DATOS + ASISTENTES ═══════════════════════════════ -->
 <div class="step active" id="step1">
   <div class="step-title">Tus datos</div>
-  <p class="step-sub">Completá el formulario y te mostramos cómo pagar.</p>
+  <p class="step-sub">Completá el formulario. Si comprás más de una entrada, cargá los datos de cada asistente.</p>
 
   <div class="row2">
     <div class="field-group">
       <label class="field-label" for="f-nombre">Nombre *</label>
-      <input type="text" class="field-input" id="f-nombre" placeholder="Juan" autocomplete="nope">
+      <input type="text" class="field-input" id="f-nombre" placeholder="Juan" autocomplete="nope"
+             oninput="syncAttendee1()" onblur="syncAttendee1()">
       <div class="field-error" id="e-nombre">Ingresá tu nombre</div>
     </div>
     <div class="field-group">
       <label class="field-label" for="f-apellido">Apellido *</label>
-      <input type="text" class="field-input" id="f-apellido" placeholder="García" autocomplete="nope">
+      <input type="text" class="field-input" id="f-apellido" placeholder="García" autocomplete="nope"
+             oninput="syncAttendee1()" onblur="syncAttendee1()">
       <div class="field-error" id="e-apellido">Ingresá tu apellido</div>
     </div>
   </div>
@@ -273,23 +338,26 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
       <label class="field-label" for="f-tel">Teléfono *</label>
       <div style="display:flex;align-items:stretch">
         <span style="background:var(--surface2);border:1px solid var(--border2);border-right:none;border-radius:var(--r) 0 0 var(--r);padding:12px 14px;font-size:15px;color:var(--gold);white-space:nowrap;font-weight:600;display:flex;align-items:center">+549</span>
-        <input type="tel" class="field-input" id="f-tel" placeholder="11 1234 5678" autocomplete="tel" inputmode="numeric" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'');telFeedback()" onblur="telFeedback()" style="border-radius:0 var(--r) var(--r) 0;border-left:none;flex:1">
+        <input type="tel" class="field-input" id="f-tel" placeholder="11 1234 5678" autocomplete="tel" inputmode="numeric" maxlength="10"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'');telFeedback()" onblur="telFeedback()"
+               style="border-radius:0 var(--r) var(--r) 0;border-left:none;flex:1">
       </div>
       <div id="tel-feedback" style="font-size:11px;color:var(--muted);margin-top:4px;min-height:15px;font-style:italic;transition:color 0.2s"></div>
       <div class="field-error" id="e-tel">Ingresá 10 dígitos (ej: 11 1234 5678)</div>
     </div>
     <div class="field-group">
       <label class="field-label" for="f-dni">DNI *</label>
-      <input type="text" class="field-input" id="f-dni" placeholder="12345678" inputmode="numeric" maxlength="8" autocomplete="off" oninput="this.value=this.value.replace(/[^0-9]/g,'');dniFeedback()" onblur="dniFeedback()">
+      <input type="text" class="field-input" id="f-dni" placeholder="12345678" inputmode="numeric" maxlength="8" autocomplete="off"
+             oninput="this.value=this.value.replace(/[^0-9]/g,'');dniFeedback();syncAttendee1()" onblur="dniFeedback();syncAttendee1()">
       <div id="dni-feedback" style="font-size:11px;color:var(--muted);margin-top:4px;min-height:15px;font-style:italic;transition:color 0.2s"></div>
       <div class="field-error" id="e-dni">Ingresá un DNI válido (7 u 8 dígitos)</div>
     </div>
   </div>
 
+  <!-- TICKET COUNTER -->
   <div class="ticket-box">
     <div class="ticket-box-head">
       <span class="ticket-box-title">Entradas preventa</span>
-
     </div>
     <div class="counter-row">
       <div>
@@ -312,10 +380,24 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
     </div>
   </div>
 
+  <!-- ── ATTENDEE SLOTS (shown when qty > 1, always shown when qty = 1) ── -->
+  <div id="attendees-section">
+    <div class="attendees-header">
+      <div class="attendees-header-line"></div>
+      <span class="attendees-header-label">Datos de los asistentes</span>
+      <div class="attendees-header-line"></div>
+    </div>
+    <div id="attendees-list"></div>
+    <!-- hint shown only when qty > 1 -->
+    <div id="attendees-hint" style="display:none;font-size:12px;color:var(--muted);font-style:italic;text-align:center;margin-bottom:14px;line-height:1.5;padding:0 4px">
+      Nombre y apellido requeridos · DNI opcional para acompañantes
+    </div>
+  </div>
+
   <button class="btn-primary" onclick="goStep2()">Ver instrucciones de pago →</button>
 </div>
 
-<!-- STEP 2: PAGO -->
+<!-- ═══ STEP 2: PAGO ══════════════════════════════════════════════ -->
 <div class="step" id="step2">
   <div class="pay-summary">
     <div class="pay-summary-lbl">Resumen · Preventa</div>
@@ -323,6 +405,12 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
     <div class="pay-detail" id="s-detalle">—</div>
     <div class="pay-total" id="s-total">$0</div>
     <div class="pay-total-sub">Total exacto a transferir</div>
+  </div>
+
+  <!-- Attendee summary list in step 2 -->
+  <div id="s-attendees-wrap" style="display:none;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:8px">Lista de asistentes</div>
+    <div class="attendee-summary-list" id="s-attendees-list"></div>
   </div>
 
   <div class="alias-box">
@@ -343,29 +431,29 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
     </div>
     <div class="step-item">
       <div class="step-num">3</div>
-      <div class="step-text"><strong>Mandá el comprobante por WhatsApp</strong> — confirmamos tu lugar en la lista en menos de 24hs.</div>
+      <div class="step-text"><strong>Mandá el comprobante por WhatsApp</strong> — confirmamos tu lugar en menos de 24hs.</div>
     </div>
   </div>
 
   <div class="note-box">
-    <strong>Importante:</strong> El lugar queda reservado pero no confirmado hasta que recibamos el comprobante por WhatsApp. Una vez verificado, <strong>te llega un email de confirmación</strong> con todos los detalles. Revisá también el spam.
+    <strong>Importante:</strong> El lugar queda reservado pero no confirmado hasta que recibamos el comprobante. Una vez verificado, <strong>te llega un email de confirmación</strong> con todos los detalles.
   </div>
 
   <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.28);border-radius:var(--r);padding:13px 15px;font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px">
     <span style="font-size:18px;flex-shrink:0;line-height:1.4">📋</span>
-    <span><strong style="color:var(--gold2)">Guardá el comprobante</strong> de la transferencia — te lo vamos a pedir por WhatsApp y puede que lo necesites en la puerta el día del evento.</span>
+    <span><strong style="color:var(--gold2)">Guardá el comprobante</strong> de la transferencia — te lo vamos a pedir por WhatsApp y puede que lo necesites en la puerta.</span>
   </div>
 
   <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border2);border-radius:var(--r);padding:12px 15px;font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:14px">
     <strong style="color:var(--ink2)">☔ Política del evento:</strong> El evento no se suspende por condiciones climáticas adversas, incluyendo lluvia.
-    En caso de suspensión total por causas de fuerza mayor, todos los compradores serán notificados por email y recibirán el reintegro del 100% del valor abonado.
+    En caso de suspensión total por causas de fuerza mayor, todos los compradores serán notificados y recibirán el reintegro del 100%.
   </div>
 
   <button class="btn-primary" onclick="confirmar()">Ya transferí — Registrar mi reserva →</button>
   <button class="btn-secondary" onclick="goStep1()">← Volver a mis datos</button>
 </div>
 
-<!-- STEP 3: GRACIAS -->
+<!-- ═══ STEP 3: GRACIAS ════════════════════════════════════════════ -->
 <div class="step" id="step3">
   <div class="thanks-wrap thanks">
     <div class="thanks-ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
@@ -381,99 +469,110 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
     <div class="thanks-divider" style="margin-top:28px"></div>
     <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:var(--r);padding:12px 16px;margin-top:16px;font-size:13px;color:var(--ink2);line-height:1.6">
       📧 <strong style="color:var(--gold2)">Recibirás un email de confirmación dentro de las 24hs</strong><br>
-      <span style="font-size:12px;color:var(--muted)">Una vez que verifiquemos la transferencia, te llega la confirmación por email con todos los detalles.</span>
+      <span style="font-size:12px;color:var(--muted)">Una vez que verifiquemos la transferencia, te llega la confirmación con todos los detalles.</span>
     </div>
   </div>
 </div>
 
 </div><!-- /view-event -->
+
 <script src="events.js"></script>
 <script>
 
-// ── CATALOG: render cards ──────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+//  ESTADO GLOBAL
+// ══════════════════════════════════════════════════════════════════
+let CFG       = {};
+let qty       = 1;
+let available = 0;
+let user      = {};
+let saving    = false;
+
+const MAX_PER_BUY = 10;
+
+function ars(n){ return '$' + n.toLocaleString('es-AR'); }
+
+function fmtDate(d) {
+  const mm  = String(d.getMonth()+1).padStart(2,'0');
+  const dd  = String(d.getDate()).padStart(2,'0');
+  const yyyy = d.getFullYear();
+  const hh  = String(d.getHours()).padStart(2,'0');
+  const min = String(d.getMinutes()).padStart(2,'0');
+  const ss  = String(d.getSeconds()).padStart(2,'0');
+  return mm+'/'+dd+'/'+yyyy+' '+hh+':'+min+':'+ss;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  CATALOG
+// ══════════════════════════════════════════════════════════════════
 function renderCatalog() {
-  // Frase del portal, debajo de "Entradas Online". Solo en el catálogo.
-  // Si PORTAL no existe o está vacío, el <p> queda oculto y no deja hueco.
   var pt = document.getElementById('portal-tagline');
   if (pt) {
     var frase = (typeof PORTAL !== 'undefined') ? pickTagline(PORTAL.tagline) : '';
     pt.textContent   = frase;
     pt.style.display = frase ? 'block' : 'none';
   }
-
   var sorted = EVENTS.slice().sort(function(a,b){ return a.dateSort - b.dateSort; });
   var grid = document.getElementById('events-grid');
-    grid.innerHTML = sorted.map(createEventCard).join('');
+  grid.innerHTML = sorted.map(createEventCard).join('');
 
-  // Assign onclick directly to each card element — safest possible approach
-  // No string escaping, no data-attribute reads, direct DOM reference
   sorted.forEach(function(ev) {
-    var evId = String(ev.id);  // capture as plain string
-    var card = grid.querySelector('[data-evid="' + evId + '"]');
+    var evId = String(ev.id);
+    var card = grid.querySelector('[data-evid="'+evId+'"]');
     if (card) {
-      card.onclick = function(e) {
-        e.stopPropagation();
-        window.selectEvent(evId);
-      };
+      card.onclick = function(e) { e.stopPropagation(); window.selectEvent(evId); };
     }
   });
 
-  // Apply contain to left image for events with imageLeftContain flag
   sorted.forEach(function(ev) {
     if (ev.imageLeftContain && ev.images && ev.images.length > 1) {
-      var card = grid.querySelector('[data-evid="' + ev.id + '"]');
+      var card = grid.querySelector('[data-evid="'+ev.id+'"]');
       if (card) {
         var halves = card.querySelectorAll('.ev-card-img-half');
         if (halves[0]) {
-          halves[0].style.backgroundSize    = 'contain';
-          halves[0].style.backgroundRepeat  = 'no-repeat';
-          halves[0].style.backgroundColor   = '#0e0d0b';
+          halves[0].style.backgroundSize   = 'contain';
+          halves[0].style.backgroundRepeat = 'no-repeat';
+          halves[0].style.backgroundColor  = '#0e0d0b';
         }
       }
     }
   });
 }
 
-// Una frase puede ser un string o un array (rota en cada carga).
-// Devuelve '' si no hay nada, así el elemento ni se dibuja.
 function pickTagline(t) {
-  if (Array.isArray(t)) return t.length ? t[Math.floor(Math.random() * t.length)] : '';
+  if (Array.isArray(t)) return t.length ? t[Math.floor(Math.random()*t.length)] : '';
   return t ? String(t) : '';
 }
 
-// ── CATALOG: create one event card ──────────────────────────────
 function createEventCard(ev) {
   var tag = pickTagline(ev.tagline);
   var imgHtml = ev.images.length === 1
-    ? '<div class="ev-card-img-half" style="background-image:url(\'' + ev.images[0] + '\');background-size:' + (ev.imageContain ? 'contain' : 'cover') + ';background-repeat:no-repeat;background-color:#0e0d0b;flex:1"></div>'
-    : '<div class="ev-card-img-half" style="background-image:url(\'' + ev.images[0] + '\')"></div>' +
-      '<div class="ev-card-img-half" style="background-image:url(\'' + ev.images[1] + '\')"></div>';
+    ? '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[0]+'\');background-size:'+(ev.imageContain?'contain':'cover')+';background-repeat:no-repeat;background-color:#0e0d0b;flex:1"></div>'
+    : '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[0]+'\')"></div>'+
+      '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[1]+'\')"></div>';
 
-  return '<div class="ev-card" data-evid="' + ev.id + '" style="cursor:pointer">' +
-    '<div class="ev-card-img">' + imgHtml + '</div>' +
-    '<div class="ev-card-body">' +
-    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
-    (ev.venueLogo ? '<img src="' + ev.venueLogo + '" style="height:22px;width:22px;border-radius:50%;opacity:.75;flex-shrink:0">' : '') +
-    '<span class="ev-venue" style="margin-bottom:0">' + ev.venue + (ev.city ? ' \u00b7 ' + ev.city : '') + '</span>' +
-    '</div>' +
-    '<h2 class="ev-name">' + ev.name + '</h2>' +
-    (tag ? '<p class="ev-tagline">' + tag + '</p>' : '') +
-    '<p class="ev-date">' + ev.dateDisplay + '</p>' +
-    '<div class="ev-price-row">' +
-      '<span class="ev-price">$' + ev.price.toLocaleString('es-AR') + '</span>' +
-      '<span class="preventa-badge" style="font-size:9px;padding:2px 8px">Preventa</span>' +
-    '</div>' +
-    '<button class="ev-btn" id="btn-' + ev.id + '">' +
-      'Ver y comprar entradas \u2192' +
-    '</button>' +
-    '<p class="ev-avail" id="avail-' + ev.id + '"></p>' +
+  return '<div class="ev-card" data-evid="'+ev.id+'" style="cursor:pointer">'+
+    '<div class="ev-card-img">'+imgHtml+'</div>'+
+    '<div class="ev-card-body">'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+    (ev.venueLogo?'<img src="'+ev.venueLogo+'" style="height:22px;width:22px;border-radius:50%;opacity:.75;flex-shrink:0">':'')+
+    '<span class="ev-venue" style="margin-bottom:0">'+ev.venue+(ev.city?' · '+ev.city:'')+'</span>'+
+    '</div>'+
+    '<h2 class="ev-name">'+ev.name+'</h2>'+
+    (tag?'<p class="ev-tagline">'+tag+'</p>':'')+
+    '<p class="ev-date">'+ev.dateDisplay+'</p>'+
+    '<div class="ev-price-row">'+
+      '<span class="ev-price">$'+ev.price.toLocaleString('es-AR')+'</span>'+
+      '<span class="preventa-badge" style="font-size:9px;padding:2px 8px">Preventa</span>'+
+    '</div>'+
+    '<button class="ev-btn" id="btn-'+ev.id+'">Ver y comprar entradas →</button>'+
+    '<p class="ev-avail" id="avail-'+ev.id+'"></p>'+
     '</div></div>';
 }
 
-// ── CATALOG: check availability per event ─────────────────────────
 function checkEventAvail(ev) {
   if (!ev.sheetUrl || ev.sheetUrl === 'APPS_SCRIPT_URL') return;
-  var cbName = 'chamicoCb_cat_' + ev.id.replace(/-/g,'_') + '_' + Date.now();
+  var cbName = 'chamicoCb_cat_'+ev.id.replace(/-/g,'_')+'_'+Date.now();
   var script = document.createElement('script');
   var done = false;
 
@@ -481,41 +580,553 @@ function checkEventAvail(ev) {
     if (done) return; done = true;
     delete window[cbName];
     if (document.head.contains(script)) document.head.removeChild(script);
-    var avEl  = document.getElementById('avail-' + ev.id);
-    var btnEl = document.getElementById('btn-'   + ev.id);
+    var avEl  = document.getElementById('avail-'+ev.id);
+    var btnEl = document.getElementById('btn-'+ev.id);
     if (!avEl) return;
     var avail = (typeof data.available === 'number') ? data.available : ev.maxTickets;
     if (avail <= 0) {
-      avEl.textContent      = '\ud83d\udd34 Entradas agotadas';
-      avEl.style.color      = 'var(--danger)';
-      btnEl.disabled        = true;
-      btnEl.textContent     = 'Agotadas';
+      avEl.textContent  = '🔴 Entradas agotadas';
+      avEl.style.color  = 'var(--danger)';
+      btnEl.disabled    = true;
+      btnEl.textContent = 'Agotadas';
     } else {
-      var threshold = Math.ceil((ev.maxTickets || 350) * 0.1);
+      var threshold = Math.ceil((ev.maxTickets||350)*0.1);
       if (avail <= threshold) {
-        avEl.textContent  = '\u26a1 \u00daltimas ' + avail + ' entradas!';
-        avEl.style.color  = 'var(--orange)';
+        avEl.textContent = '⚡ Últimas '+avail+' entradas!';
+        avEl.style.color = 'var(--orange)';
       } else {
         avEl.textContent = '';
       }
     }
   };
-
-  script.src = ev.sheetUrl + '?callback=' + cbName + '&evento=' + encodeURIComponent(ev.name);
-  script.onerror = function() { if (!done) { done = true; } };
-  setTimeout(function() { if (!done) { done = true; } }, 8000);
+  script.src = ev.sheetUrl+'?callback='+cbName+'&evento='+encodeURIComponent(ev.name);
+  script.onerror = function() { if (!done) done = true; };
+  setTimeout(function() { if (!done) done = true; }, 8000);
   document.head.appendChild(script);
 }
 
-// ── SELECT EVENT ──────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+//  ATTENDEE SLOTS
+// ══════════════════════════════════════════════════════════════════
+
+/**
+ * Renders attendee cards based on current qty.
+ * Card 1 is always pre-filled from buyer fields (editable).
+ * Cards 2+ start blank.
+ * We preserve existing values when re-rendering (qty change).
+ */
+function renderAttendeeSlots() {
+  var list = document.getElementById('attendees-list');
+  var hint = document.getElementById('attendees-hint');
+
+  // Save current values before re-rendering
+  var saved = readAttendeeValues();
+
+  list.innerHTML = '';
+  hint.style.display = qty > 1 ? 'block' : 'none';
+
+  for (var i = 1; i <= qty; i++) {
+    var prev = saved[i] || {};
+    var isFirst = (i === 1);
+
+    var card = document.createElement('div');
+    card.className = 'attendee-card' + (isFirst ? ' ticket-1' : '');
+    card.id = 'attendee-card-' + i;
+
+    var headerHTML =
+      '<div class="attendee-card-header">' +
+        '<div class="attendee-ticket-label">' +
+          '<div class="attendee-ticket-num' + (isFirst ? ' num-1' : '') + '">' + i + '</div>' +
+          'Entrada ' + i +
+        '</div>' +
+        (isFirst
+          ? '<span class="attendee-you-badge">Vos</span>'
+          : '<span class="attendee-optional-badge">DNI opcional</span>') +
+      '</div>';
+
+    // First name
+    var nombreVal = prev.nombre || (isFirst ? document.getElementById('f-nombre').value.trim() : '');
+    var apellidoVal = prev.apellido || (isFirst ? document.getElementById('f-apellido').value.trim() : '');
+    var dniVal = prev.dni || (isFirst ? document.getElementById('f-dni').value.trim() : '');
+
+    var fieldsHTML =
+      '<div class="row2">' +
+        '<div class="field-group" style="margin-bottom:10px">' +
+          '<label class="field-label" for="at-nombre-' + i + '">Nombre *</label>' +
+          '<input type="text" class="field-input" id="at-nombre-' + i + '" placeholder="Nombre" value="' + escAttr(nombreVal) + '"' +
+            (isFirst ? ' oninput="syncBuyerFromAttendee1()" onblur="syncBuyerFromAttendee1()"' : '') + '>' +
+          '<div class="field-error" id="at-err-nombre-' + i + '">Nombre requerido</div>' +
+        '</div>' +
+        '<div class="field-group" style="margin-bottom:10px">' +
+          '<label class="field-label" for="at-apellido-' + i + '">Apellido *</label>' +
+          '<input type="text" class="field-input" id="at-apellido-' + i + '" placeholder="Apellido" value="' + escAttr(apellidoVal) + '"' +
+            (isFirst ? ' oninput="syncBuyerFromAttendee1()" onblur="syncBuyerFromAttendee1()"' : '') + '>' +
+          '<div class="field-error" id="at-err-apellido-' + i + '">Apellido requerido</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="field-group" style="margin-bottom:0">' +
+        '<label class="field-label" for="at-dni-' + i + '">DNI' + (isFirst ? ' *' : ' (opcional)') + '</label>' +
+        '<input type="text" class="field-input" id="at-dni-' + i + '" placeholder="' + (isFirst ? '12345678' : 'Dejar vacío si no sabés') + '" value="' + escAttr(dniVal) + '" inputmode="numeric" maxlength="8"' +
+          ' oninput="this.value=this.value.replace(/[^0-9]/g,\'\')"' +
+          (isFirst ? ' onblur="syncBuyerFromAttendee1()"' : '') + '>' +
+        (isFirst ? '<div class="field-error" id="at-err-dni-' + i + '">Ingresá un DNI válido</div>' : '') +
+      '</div>';
+
+    card.innerHTML = headerHTML + fieldsHTML;
+    list.appendChild(card);
+  }
+}
+
+/** Read current values from attendee fields into an object keyed by index */
+function readAttendeeValues() {
+  var out = {};
+  for (var i = 1; i <= MAX_PER_BUY; i++) {
+    var nEl = document.getElementById('at-nombre-' + i);
+    if (!nEl) break;
+    out[i] = {
+      nombre:   nEl.value.trim(),
+      apellido: (document.getElementById('at-apellido-' + i) || {}).value || '',
+      dni:      (document.getElementById('at-dni-' + i) || {}).value || '',
+    };
+  }
+  return out;
+}
+
+/** When buyer fields (step 1 top) change → sync into attendee card 1 */
+function syncAttendee1() {
+  var nEl = document.getElementById('at-nombre-1');
+  var aEl = document.getElementById('at-apellido-1');
+  var dEl = document.getElementById('at-dni-1');
+  if (!nEl) return;
+  // Only sync if the attendee field is still matching or empty (don't overwrite manual edits)
+  var nombre   = document.getElementById('f-nombre').value.trim();
+  var apellido = document.getElementById('f-apellido').value.trim();
+  var dni      = document.getElementById('f-dni').value.trim();
+  if (nEl.value === '' || nEl.dataset.synced === 'auto') { nEl.value = nombre; nEl.dataset.synced = 'auto'; }
+  if (aEl && (aEl.value === '' || aEl.dataset.synced === 'auto')) { aEl.value = apellido; aEl.dataset.synced = 'auto'; }
+  if (dEl && (dEl.value === '' || dEl.dataset.synced === 'auto')) { dEl.value = dni; dEl.dataset.synced = 'auto'; }
+}
+
+/** When attendee card 1 is edited manually → sync back to buyer top fields */
+function syncBuyerFromAttendee1() {
+  var nEl = document.getElementById('at-nombre-1');
+  var aEl = document.getElementById('at-apellido-1');
+  var dEl = document.getElementById('at-dni-1');
+  if (!nEl) return;
+  // Mark as manually edited so syncAttendee1 won't overwrite
+  nEl.dataset.synced = 'manual';
+  if (aEl) aEl.dataset.synced = 'manual';
+  if (dEl) dEl.dataset.synced = 'manual';
+
+  document.getElementById('f-nombre').value   = nEl.value;
+  document.getElementById('f-apellido').value = aEl ? aEl.value : '';
+  document.getElementById('f-dni').value      = dEl ? dEl.value : '';
+}
+
+/** Validate all attendee cards. Returns true if valid. */
+function validateAttendees() {
+  var ok = true;
+  for (var i = 1; i <= qty; i++) {
+    var nEl = document.getElementById('at-nombre-' + i);
+    var aEl = document.getElementById('at-apellido-' + i);
+    var nErrEl = document.getElementById('at-err-nombre-' + i);
+    var aErrEl = document.getElementById('at-err-apellido-' + i);
+
+    var nOk = nEl && nEl.value.trim().length > 1;
+    var aOk = aEl && aEl.value.trim().length > 1;
+
+    if (nEl) nEl.classList.toggle('err', !nOk);
+    if (nErrEl) nErrEl.classList.toggle('show', !nOk);
+    if (aEl) aEl.classList.toggle('err', !aOk);
+    if (aErrEl) aErrEl.classList.toggle('show', !aOk);
+
+    // DNI only required for ticket 1
+    if (i === 1) {
+      var dEl    = document.getElementById('at-dni-1');
+      var dErrEl = document.getElementById('at-err-dni-1');
+      var dOk    = dEl && dniOk(dEl.value);
+      if (dEl) dEl.classList.toggle('err', !dOk);
+      if (dErrEl) dErrEl.classList.toggle('show', !dOk);
+      if (!dOk) ok = false;
+    }
+
+    // Scroll to first error card
+    if (!nOk || !aOk) {
+      if (ok) {
+        // First error — scroll there
+        var card = document.getElementById('attendee-card-' + i);
+        if (card) card.scrollIntoView({behavior:'smooth', block:'center'});
+        // Mark card border
+        if (card) card.classList.add('has-error');
+      }
+      ok = false;
+    } else {
+      var card2 = document.getElementById('attendee-card-' + i);
+      if (card2) card2.classList.remove('has-error');
+    }
+  }
+  return ok;
+}
+
+/** Collect all attendee data as an array of {nombre, apellido, dni} */
+function collectAttendees() {
+  var out = [];
+  for (var i = 1; i <= qty; i++) {
+    var nEl = document.getElementById('at-nombre-' + i);
+    var aEl = document.getElementById('at-apellido-' + i);
+    var dEl = document.getElementById('at-dni-' + i);
+    out.push({
+      nombre:   nEl ? nEl.value.trim() : '',
+      apellido: aEl ? aEl.value.trim() : '',
+      dni:      dEl ? dEl.value.trim() : '',
+    });
+  }
+  return out;
+}
+
+function escAttr(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  AVAILABILITY
+// ══════════════════════════════════════════════════════════════════
+function setAvailUI(avail) {
+  available = avail;
+  var dots    = document.getElementById('progressDots');
+  var soldOut = document.getElementById('soldOut');
+
+  if (avail <= 0) {
+    dots.style.display = 'none';
+    document.getElementById('step1').classList.remove('active');
+    soldOut.classList.add('active');
+    return;
+  }
+  soldOut.classList.remove('active');
+  dots.style.display = '';
+  updateCounterMax();
+}
+
+function updateCounterMax() {
+  var maxBuy = Math.min(available, MAX_PER_BUY);
+  if (qty > maxBuy) qty = maxBuy;
+  document.getElementById('qtyNum').textContent  = qty;
+  var unitP  = CFG.price;
+  var unitEl = document.getElementById('unitPriceText');
+  if (unitEl) unitEl.textContent = '$' + unitP.toLocaleString('es-AR') + ' por persona';
+  document.getElementById('totalVal').textContent = ars(qty * unitP);
+  document.getElementById('btnMinus').disabled = qty <= 1;
+  document.getElementById('btnPlus').disabled  = qty >= maxBuy;
+  renderAttendeeSlots();
+}
+
+function loadAvailability() {
+  if (!CFG.sheetUrl) { setAvailUI(CFG.maxTickets || 0); return; }
+
+  var cbName = 'chamicoCb_' + Date.now();
+  var script = document.createElement('script');
+  var done   = false;
+
+  function finish(avail) {
+    if (done) return;
+    done = true;
+    delete window[cbName];
+    if (document.head.contains(script)) document.head.removeChild(script);
+    setAvailUI(avail);
+  }
+
+  window[cbName] = function(data) {
+    finish(typeof data.available === 'number' ? data.available : CFG.maxTickets);
+  };
+  script.onerror = function() { finish(CFG.maxTickets); };
+  setTimeout(function() { finish(CFG.maxTickets); }, 6000);
+
+  script.src = CFG.sheetUrl + '?callback=' + cbName + '&evento=' + encodeURIComponent(CFG.eventName);
+  document.head.appendChild(script);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  COUNTER
+// ══════════════════════════════════════════════════════════════════
+function changeQty(d) {
+  var maxBuy = Math.min(available, MAX_PER_BUY);
+  qty = Math.max(1, Math.min(qty + d, maxBuy));
+  document.getElementById('qtyNum').textContent       = qty;
+  document.getElementById('totalVal').textContent     = ars(qty * CFG.price);
+  document.getElementById('btnMinus').disabled        = qty <= 1;
+  document.getElementById('btnPlus').disabled         = qty >= maxBuy;
+  renderAttendeeSlots();
+  // Re-sync buyer fields into card 1 after re-render
+  syncAttendee1();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  VALIDATION
+// ══════════════════════════════════════════════════════════════════
+function telFeedback() {
+  var input = document.getElementById('f-tel');
+  var fb    = document.getElementById('tel-feedback');
+  if (!input||!fb) return;
+  var val = input.value.replace(/[^0-9]/g,'');
+  input.value = val;
+  if (val.length === 0) {
+    fb.textContent = '';
+  } else if (val.length < 10) {
+    fb.style.color   = 'var(--danger)';
+    fb.textContent   = val.length + ' / 10 dígitos';
+  } else {
+    fb.style.color   = 'var(--green)';
+    fb.textContent   = '✓ Listo (+549 ' + val + ')';
+    document.getElementById('f-tel').classList.remove('err');
+    document.getElementById('e-tel').classList.remove('show');
+  }
+}
+
+function dniOk(v) {
+  var d = String(v||'').replace(/\D/g,'');
+  return (d.length === 7 || d.length === 8) && !/^(\d)\1+$/.test(d);
+}
+
+function dniFeedback() {
+  var input = document.getElementById('f-dni');
+  var fb    = document.getElementById('dni-feedback');
+  if (!input||!fb) return;
+  var d = input.value.replace(/\D/g,'').slice(0,8);
+  input.value = d;
+  if (d.length === 0) {
+    fb.textContent = '';
+  } else if (d.length < 7) {
+    fb.style.color = 'var(--danger)';
+    fb.textContent = d.length + ' / 7 dígitos mínimo';
+  } else if (/^(\d)\1+$/.test(d)) {
+    fb.style.color = 'var(--danger)';
+    fb.textContent = 'Revisá el número';
+  } else {
+    fb.style.color = 'var(--green)';
+    fb.textContent = '✓ Listo';
+    input.classList.remove('err');
+    document.getElementById('e-dni').classList.remove('show');
+  }
+}
+
+function validate() {
+  var rules = [
+    {id:'f-nombre',   err:'e-nombre',   ok: function(v){ return v.trim().length > 1; }},
+    {id:'f-apellido', err:'e-apellido', ok: function(v){ return v.trim().length > 1; }},
+    {id:'f-email',    err:'e-email',    ok: function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }},
+    {id:'f-tel',      err:'e-tel',      ok: function(v){ return v.replace(/[^0-9]/g,'').length === 10; }},
+    {id:'f-dni',      err:'e-dni',      ok: function(v){ return dniOk(v); }},
+  ];
+  var valid = true;
+  rules.forEach(function(r) {
+    var el = document.getElementById(r.id);
+    var ok = r.ok(el.value);
+    el.classList.toggle('err', !ok);
+    document.getElementById(r.err).classList.toggle('show', !ok);
+    if (!ok) valid = false;
+  });
+  return valid;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  STEPS
+// ══════════════════════════════════════════════════════════════════
+function goStep2() {
+  if (!validate()) { window.scrollTo({top:0,behavior:'smooth'}); return; }
+  if (!validateAttendees()) return; // scrolls to first error card
+
+  var attendees = collectAttendees();
+
+  user = {
+    nombre:    document.getElementById('f-nombre').value.trim(),
+    apellido:  document.getElementById('f-apellido').value.trim(),
+    email:     document.getElementById('f-email').value.trim(),
+    tel:       document.getElementById('f-tel').value.trim(),
+    dni:       document.getElementById('f-dni').value.replace(/\D/g,''),
+    qty:       qty,
+    total:     qty * CFG.price,
+    attendees: attendees,
+  };
+
+  // Populate step 2 summary
+  document.getElementById('s-nombre').textContent  = user.nombre + ' ' + user.apellido;
+  document.getElementById('s-detalle').textContent =
+    user.qty + ' entrada' + (user.qty > 1 ? 's' : '') + ' preventa · DNI ' + user.dni;
+  document.getElementById('s-total').textContent   = ars(user.total);
+
+  // Attendee list in step 2 (only if qty > 1)
+  var wrap = document.getElementById('s-attendees-wrap');
+  var list = document.getElementById('s-attendees-list');
+  if (user.qty > 1) {
+    list.innerHTML = user.attendees.map(function(a, i) {
+      return '<div class="attendee-summary-item">' +
+        '<span class="attendee-summary-name">🎟 ' + escAttr(a.nombre) + ' ' + escAttr(a.apellido) + '</span>' +
+        '<span class="attendee-summary-dni">' + (a.dni ? 'DNI ' + a.dni : '—') + '</span>' +
+        '</div>';
+    }).join('');
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+  }
+
+  setStep(2);
+}
+
+function goStep1() { setStep(1); }
+
+async function confirmar() {
+  if (saving) return;
+  saving = true;
+
+  // Generate order code once — shared across all ticket rows of this purchase
+  // Format: TRF-A3K9PQ  (TRF + 6 uppercase alphanumeric chars)
+  var orderCode = 'TRF-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  // Build WhatsApp message
+  var attendeeLines = '';
+  if (user.qty > 1) {
+    attendeeLines = '\n*Asistentes:*\n' + user.attendees.map(function(a, i) {
+      return (i+1) + '. ' + a.nombre + ' ' + a.apellido + (a.dni ? ' · DNI ' + a.dni : '');
+    }).join('\n');
+  }
+
+  var msg = encodeURIComponent(
+    'Hola! Hice la transferencia para mis entradas preventa 🎸\n\n' +
+    '*Evento:* ' + CFG.eventName + '\n' +
+    '*Código orden:* ' + orderCode + '\n' +
+    '*Comprador:* ' + user.nombre + ' ' + user.apellido + '\n' +
+    '*DNI:* ' + user.dni + '\n' +
+    '*Cantidad:* ' + user.qty + ' entrada' + (user.qty > 1 ? 's' : '') + ' (preventa)\n' +
+    '*Total transferido:* ' + ars(user.total) +
+    attendeeLines + '\n\n' +
+    'Adjunto el comprobante 👆\n\n_Guardalo — puede que lo pidan en la entrada._'
+  );
+  document.getElementById('waLink').href = 'https://wa.me/' + CFG.whatsapp + '?text=' + msg;
+
+  document.getElementById('overlay').classList.add('show');
+
+  // Fee breakdown per ticket — buyer pays face value, DataManIAcs takes 4%, venue gets 96%
+  var precioEntrada  = CFG.price;                          // face value — what buyer pays
+  var comisionDM     = Math.round(precioEntrada * 0.04);   // DataManIAcs 4%
+  var venueRecibe    = precioEntrada - comisionDM;          // venue 96%
+
+  // One row per ticket — columns aligned with Tickets_Transferencia sheet layout
+  var now = new Date();
+  var sharedBase = {
+    'Fecha y hora':        fmtDate(now),
+    'Código orden':        orderCode,
+    'Nombre comprador':    user.nombre,
+    'Apellido comprador':  user.apellido,
+    'Email':               user.email,
+    'Teléfono':            '+549' + user.tel,
+    'DNI comprador':       user.dni,
+    'Cantidad entradas':   user.qty,
+    'Precio por entrada':  precioEntrada,
+    'Comisión DM':   comisionDM,
+    'Venue recibe':  venueRecibe,
+    'Estado':              'Pendiente de comprobante',
+    'Evento':              CFG.eventName,
+    'Fecha del evento':    CFG.eventDateFormatted,
+    'Venue':               CFG.venue,
+    'Dispositivo':         getDevice(),
+    'Tipo':                'Preventa',
+    'WhatsApp recibido':   'No',
+  };
+
+  try {
+    // Sequential saves — one row per ticket — avoids Apps Script race conditions
+    for (var i = 0; i < user.attendees.length; i++) {
+      var a          = user.attendees[i];
+      var ticketCode = orderCode + '-' + (i + 1);   // TRF-A3K9PQ-1, -2, -3 …
+      var row = Object.assign({}, sharedBase, {
+        'Código ticket':      ticketCode,
+        'N° ticket en orden': i + 1,
+        'Nombre asistente':   a.nombre,
+        'Apellido asistente': a.apellido,
+        'DNI asistente':      a.dni || '',
+      });
+      await saveViaScript(row);
+    }
+  } catch(e){ console.warn(e); }
+
+  document.getElementById('overlay').classList.remove('show');
+  saving = false;
+  setStep(3);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  DEVICE + SAVE
+// ══════════════════════════════════════════════════════════════════
+function getDevice() {
+  var ua = navigator.userAgent;
+  if (/iPhone/.test(ua))  return 'iPhone iOS '+((/OS ([\d_]+)/.exec(ua)||['','?'])[1].replace(/_/g,'.'));
+  if (/iPad/.test(ua))    return 'iPad iOS '  +((/OS ([\d_]+)/.exec(ua)||['','?'])[1].replace(/_/g,'.'));
+  if (/Android/.test(ua)) return 'Android';
+  if (/Windows/.test(ua)) return 'Windows PC';
+  if (/Mac/.test(ua))     return 'Mac';
+  return 'Otro';
+}
+
+function saveViaScript(payload) {
+  var json = JSON.stringify(payload);
+  try {
+    var blob = new Blob([json], {type:'application/json'});
+    var sent = navigator.sendBeacon('/api/save', blob);
+    if (!sent) throw new Error('sendBeacon returned false');
+  } catch(e) {
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/save', true);
+      xhr.setRequestHeader('Content-Type','application/json');
+      xhr.send(json);
+    } catch(e2){}
+  }
+  return new Promise(function(resolve){ setTimeout(function(){ resolve({status:'ok'}); }, 600); });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════════════════════════
+function setStep(n) {
+  ['step1','step2','step3'].forEach(function(id,i){
+    document.getElementById(id).classList.toggle('active', i+1===n);
+  });
+  ['d1','d2','d3'].forEach(function(id,i){
+    var el = document.getElementById(id);
+    el.classList.remove('active','done');
+    if (i+1===n) el.classList.add('active');
+    if (i+1<n)   el.classList.add('done');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function copyAlias() {
+  var copy = function() {
+    var btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copiado'; btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent='Copiar alias'; btn.classList.remove('copied'); }, 2000);
+  };
+  navigator.clipboard
+    ? navigator.clipboard.writeText(CFG.mpAlias).then(copy).catch(function(){ fallbackCopy(); })
+    : fallbackCopy();
+  function fallbackCopy(){
+    var el = document.createElement('textarea');
+    el.value = CFG.mpAlias; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el); copy();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SELECT EVENT
+// ══════════════════════════════════════════════════════════════════
 window.selectEvent = function(eventId) {
   var catalog   = document.getElementById('view-catalog');
   var eventView = document.getElementById('view-event');
   if (catalog)   catalog.style.display   = 'none';
   if (eventView) eventView.style.display = 'block';
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
 
-  var ev = EVENTS.find(function(e) { return e.id === eventId; });
+  var ev = EVENTS.find(function(e){ return e.id === eventId; });
   if (!ev) { console.error('Event not found:', eventId); return; }
 
   CFG = {
@@ -536,12 +1147,12 @@ window.selectEvent = function(eventId) {
     var hName = document.getElementById('hEventName');
     var hDate = document.getElementById('hEventDate');
     var alias = document.getElementById('aliasDisplay');
-    if (hName) hName.innerHTML   = '<em>' + CFG.eventName + '</em> en el Chamico';
+    if (hName) hName.innerHTML   = '<em>'+CFG.eventName+'</em> en el Chamico';
     if (hDate) hDate.textContent = CFG.eventDate;
     if (alias) alias.textContent = CFG.mpAlias;
     qty       = 1;
     available = ev.maxTickets;
-    updateCounterMax();
+    updateCounterMax();   // also calls renderAttendeeSlots
     setStep(1);
     loadAvailability();
   } catch(err) {
@@ -549,307 +1160,19 @@ window.selectEvent = function(eventId) {
   }
 };
 
-// ── SHOW CATALOG ──────────────────────────────────────────────────
 window.showCatalog = function() {
   document.getElementById('view-catalog').style.display = 'block';
   document.getElementById('view-event').style.display   = 'none';
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
 };
 
-
-// ── ESTADO ────────────────────────────────────────────────
-// CFG lo completa selectEvent() a partir de events.js.
-// No hay evento por defecto: la app arranca en el catálogo.
-let CFG       = {};
-let qty       = 1;
-let available = 0;
-let user      = {};
-let saving    = false;          // guard anti doble-envío
-
-const MAX_PER_BUY = 10;         // tope de entradas por compra
-
-function ars(n){return '$' + n.toLocaleString('es-AR')}
-
-function fmtDate(d) {
-  const mm  = String(d.getMonth() + 1).padStart(2,'0');
-  const dd  = String(d.getDate()).padStart(2,'0');
-  const yyyy = d.getFullYear();
-  const hh  = String(d.getHours()).padStart(2,'0');
-  const min = String(d.getMinutes()).padStart(2,'0');
-  const ss  = String(d.getSeconds()).padStart(2,'0');
-  return mm + '/' + dd + '/' + yyyy + ' ' + hh + ':' + min + ':' + ss;
-}
-
-// ── AVAILABILITY ─────────────────────────────────────────
-function setAvailUI(avail) {
-  available = avail;
-  var dots    = document.getElementById('progressDots');
-  var soldOut = document.getElementById('soldOut');
-
-  if (avail <= 0) {
-    // SOLD OUT — ocultar formulario, mostrar pantalla de agotado
-    dots.style.display = 'none';
-    document.getElementById('step1').classList.remove('active');
-    soldOut.classList.add('active');
-    return;
-  }
-
-  // Reset: si el evento anterior estaba agotado y este no, hay que volver atrás
-  soldOut.classList.remove('active');
-  dots.style.display = '';
-  updateCounterMax();
-}
-
-function updateCounterMax() {
-  const maxBuy = Math.min(available, MAX_PER_BUY);
-  if (qty > maxBuy) qty = maxBuy;
-  document.getElementById('qtyNum').textContent = qty;
-  var unitP = CFG.price;
-  var unitEl = document.getElementById('unitPriceText');
-  if (unitEl) unitEl.textContent = '$' + unitP.toLocaleString('es-AR') + ' por persona';
-  document.getElementById('totalVal').textContent = ars(qty * unitP);
-  document.getElementById('btnMinus').disabled = qty <= 1;
-  document.getElementById('btnPlus').disabled  = qty >= maxBuy;
-}
-
-// ── AVAILABILITY: consulta JSONP al Apps Script ──────────
-// Antes era un IIFE con nombre, así que selectEvent() no podía llamarlo
-// (ReferenceError silenciado por el try/catch) y el cupo nunca se releía.
-function loadAvailability() {
-  if (!CFG.sheetUrl) { setAvailUI(CFG.maxTickets || 0); return; }
-
-  var cbName = 'chamicoCb_' + Date.now();
-  var script = document.createElement('script');
-  var done   = false;
-
-  function finish(avail) {
-    if (done) return;
-    done = true;
-    delete window[cbName];
-    if (document.head.contains(script)) document.head.removeChild(script);
-    setAvailUI(avail);
-  }
-
-  window[cbName] = function(data) {
-    finish(typeof data.available === 'number' ? data.available : CFG.maxTickets);
-  };
-  script.onerror = function() { finish(CFG.maxTickets); };  // fallback optimista
-  setTimeout(function() { finish(CFG.maxTickets); }, 6000);
-
-  script.src = CFG.sheetUrl + '?callback=' + cbName +
-               '&evento=' + encodeURIComponent(CFG.eventName);
-  document.head.appendChild(script);
-}
-
-// ── COUNTER ───────────────────────────────────────────────
-function changeQty(d) {
-  const maxBuy = Math.min(available, MAX_PER_BUY);
-  qty = Math.max(1, Math.min(qty + d, maxBuy));
-  document.getElementById('qtyNum').textContent = qty;
-  document.getElementById('totalVal').textContent = ars(qty * CFG.price);
-  document.getElementById('btnMinus').disabled = qty <= 1;
-  document.getElementById('btnPlus').disabled  = qty >= maxBuy;
-}
-
-// ── VALIDATION ────────────────────────────────────────────
-function telFeedback() {
-  var input = document.getElementById('f-tel');
-  var fb    = document.getElementById('tel-feedback');
-  if (!input || !fb) return;
-  var val = input.value.replace(/[^0-9]/g, '');
-  input.value = val;
-  if (val.length === 0) {
-    fb.textContent = '';
-  } else if (val.length < 10) {
-    fb.style.color = 'var(--danger)';
-    fb.textContent = val.length + ' / 10 dígitos';
-  } else {
-    fb.style.color = 'var(--green)';
-    fb.textContent = '✓ Listo (+549 ' + val + ')';
-    document.getElementById('f-tel').classList.remove('err');
-    document.getElementById('e-tel').classList.remove('show');
-  }
-}
-
-// El DNI argentino tiene 7 u 8 dígitos y NO tiene dígito verificador
-// (eso es el CUIT). Lo único chequeable es el largo y que no sea basura.
-// Ojo: 12345678 es un DNI plausible, así que no se rechazan secuencias.
-// Se guarda siempre en dígitos pelados, sin puntos.
-function dniOk(v) {
-  var d = String(v || '').replace(/\D/g, '');
-  return (d.length === 7 || d.length === 8) && !/^(\d)\1+$/.test(d);
-}
-
-function dniFeedback() {
-  var input = document.getElementById('f-dni');
-  var fb    = document.getElementById('dni-feedback');
-  if (!input || !fb) return;
-  var d = input.value.replace(/\D/g, '').slice(0, 8);
-  input.value = d;
-  if (d.length === 0) {
-    fb.textContent = '';
-  } else if (d.length < 7) {
-    fb.style.color = 'var(--danger)';
-    fb.textContent = d.length + ' / 7 dígitos mínimo';
-  } else if (/^(\d)\1+$/.test(d)) {
-    fb.style.color = 'var(--danger)';
-    fb.textContent = 'Revisá el número';
-  } else {
-    fb.style.color = 'var(--green)';
-    fb.textContent = '✓ Listo';
-    input.classList.remove('err');
-    document.getElementById('e-dni').classList.remove('show');
-  }
-}
-
-function validate() {
-  const rules = [
-    {id:'f-nombre',   err:'e-nombre',   ok: v => v.trim().length > 1},
-    {id:'f-apellido', err:'e-apellido', ok: v => v.trim().length > 1},
-    {id:'f-email',    err:'e-email',    ok: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)},
-    {id:'f-tel',      err:'e-tel',      ok: v => v.replace(/[^0-9]/g,'').length === 10},
-    {id:'f-dni',      err:'e-dni',      ok: v => dniOk(v)},
-  ];
-  let valid = true;
-  rules.forEach(r => {
-    const el = document.getElementById(r.id);
-    const ok = r.ok(el.value);
-    el.classList.toggle('err', !ok);
-    document.getElementById(r.err).classList.toggle('show', !ok);
-    if (!ok) valid = false;
-  });
-  return valid;
-}
-
-// ── STEPS ─────────────────────────────────────────────────
-function goStep2() {
-  if (!validate()) { window.scrollTo({top:0,behavior:'smooth'}); return; }
-  user = {
-    nombre:   document.getElementById('f-nombre').value.trim(),
-    apellido: document.getElementById('f-apellido').value.trim(),
-    email:    document.getElementById('f-email').value.trim(),
-    tel:      document.getElementById('f-tel').value.trim(),
-    dni:      document.getElementById('f-dni').value.replace(/\D/g, ''),
-    qty, total:    qty * CFG.price,
-  };
-  document.getElementById('s-nombre').textContent  = user.nombre + ' ' + user.apellido;
-  document.getElementById('s-detalle').textContent =
-    user.qty + ' entrada' + (user.qty > 1 ? 's' : '') + ' preventa · DNI ' + user.dni;
-  document.getElementById('s-total').textContent   = ars(user.total);
-  setStep(2);
-}
-
-function goStep1() { setStep(1); }
-
-async function confirmar() {
-  if (saving) return;   // evita filas duplicadas por doble tap
-  saving = true;
-  const msg = encodeURIComponent(
-    'Hola! Hice la transferencia para mis entradas preventa 🎸\n\n' +
-    '*Evento:* ' + CFG.eventName + '\n' +
-    '*Nombre:* ' + user.nombre + ' ' + user.apellido + '\n' +
-    '*DNI:* ' + user.dni + '\n' +
-    '*Cantidad:* ' + user.qty + ' entrada' + (user.qty > 1 ? 's' : '') + ' (preventa)\n' +
-    '*Total transferido:* ' + ars(user.total) + '\n\n' +
-    'Adjunto el comprobante 👆\n\n_Guardalo — puede que lo pidan en la entrada._'
-  );
-  document.getElementById('waLink').href = 'https://wa.me/' + CFG.whatsapp + '?text=' + msg;
-
-  document.getElementById('overlay').classList.add('show');
-  const now = new Date();
-  const payload = {
-    'Fecha y hora':      fmtDate(now),
-    'Nombre':            user.nombre,
-    'Apellido':          user.apellido,
-    'Email':             user.email,
-    'Teléfono':          user.tel,
-    'DNI':               user.dni,
-    'Cantidad entradas': user.qty,
-    'Total':             user.total,
-    'Estado':            'Pendiente de comprobante',
-    'Evento':            CFG.eventName,
-    'Fecha del evento':  CFG.eventDateFormatted,
-    'Venue':             CFG.venue,
-    'Dispositivo':       getDevice(),
-    'Tipo':              'Preventa',
-  };
-  try {
-    await saveViaScript(payload);
-  } catch(e){console.warn(e)}
-
-  document.getElementById('overlay').classList.remove('show');
-  saving = false;
-  setStep(3);
-}
-
-// Detecta el dispositivo del usuario para tracking
-function getDevice() {
-  var ua = navigator.userAgent;
-  if (/iPhone/.test(ua))  return 'iPhone iOS ' + ((/OS ([\d_]+)/.exec(ua)||['','?'])[1].replace(/_/g,'.'));
-  if (/iPad/.test(ua))    return 'iPad iOS '   + ((/OS ([\d_]+)/.exec(ua)||['','?'])[1].replace(/_/g,'.'));
-  if (/Android/.test(ua)) return 'Android';
-  if (/Windows/.test(ua)) return 'Windows PC';
-  if (/Mac/.test(ua))     return 'Mac';
-  return 'Otro';
-}
-
-// Guarda la reserva: sendBeacon → /api/save (funciona en todos los dispositivos)
-function saveViaScript(payload) {
-  var json = JSON.stringify(payload);
-
-  // sendBeacon es POST nativo del browser — un solo envío, sin duplicados
-  // Funciona en iOS 11.3+, Android, desktop — no puede ser bloqueado
-  try {
-    var blob = new Blob([json], { type: 'application/json' });
-    var sent = navigator.sendBeacon('/api/save', blob);
-    if (!sent) throw new Error('sendBeacon returned false');
-  } catch(e) {
-    // Fallback: XHR POST (por si sendBeacon falla en algún browser muy viejo)
-    try {
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/save', true);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.send(json);
-    } catch(e2) {}
-  }
-
-  return new Promise(function(resolve) {
-    setTimeout(function() { resolve({ status: 'ok' }); }, 600);
-  });
-}
-
-
-function setStep(n) {
-  ['step1','step2','step3'].forEach((id,i) =>
-    document.getElementById(id).classList.toggle('active', i+1===n));
-  ['d1','d2','d3'].forEach((id,i) => {
-    const el = document.getElementById(id);
-    el.classList.remove('active','done');
-    if (i+1===n) el.classList.add('active');
-    if (i+1<n)   el.classList.add('done');
-  });
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function copyAlias() {
-  const copy = (txt) => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✓ Copiado'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copiar alias'; btn.classList.remove('copied'); }, 2000);
-  };
-  navigator.clipboard
-    ? navigator.clipboard.writeText(CFG.mpAlias).then(copy).catch(() => fallbackCopy())
-    : fallbackCopy();
-  function fallbackCopy(){
-    const el = document.createElement('textarea');
-    el.value = CFG.mpAlias; document.body.appendChild(el); el.select();
-    document.execCommand('copy'); document.body.removeChild(el); copy();
-  }
-}
-// ── INIT ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════════
 renderCatalog();
 EVENTS.forEach(checkEventAvail);
 </script>
+
 <!-- POWERED BY FOOTER -->
 <footer style="margin-top:48px;padding:24px 24px 36px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)">
   <p style="font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#6b6150;margin-bottom:14px">Powered by</p>
