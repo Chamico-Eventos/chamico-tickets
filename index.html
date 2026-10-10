@@ -1013,24 +1013,20 @@ async function confirmar() {
   // One row per ticket — columns aligned with Tickets_Transferencia sheet layout
   var now = new Date();
   var sharedBase = {
-    'Fecha y hora':        fmtDate(now),
-    'Código orden':        orderCode,
-    'Nombre comprador':    user.nombre,
-    'Apellido comprador':  user.apellido,
-    'Email':               user.email,
-    'Teléfono':            '+549' + user.tel,
-    'DNI comprador':       user.dni,
-    'Cantidad entradas':   user.qty,
-    'Precio por entrada':  precioEntrada,
-    'Comisión DM':   comisionDM,
-    'Venue recibe':  venueRecibe,
-    'Estado':              'Pendiente de comprobante',
-    'Evento':              CFG.eventName,
-    'Fecha del evento':    CFG.eventDateFormatted,
-    'Venue':               CFG.venue,
-    'Dispositivo':         getDevice(),
-    'Tipo':                'Preventa',
-    'WhatsApp recibido':   'No',
+    'Fecha y hora':       fmtDate(now),
+    'Nombre':             user.nombre,
+    'Apellido':           user.apellido,
+    'Email':              user.email,
+    'Teléfono':           '+549' + user.tel,
+    'DNI':                user.dni,
+    'Cantidad entradas':  user.qty,
+    'Total (ARS)':        precioEntrada,
+    'Tipo':               'Preventa',
+    'Estado':             'Pendiente de comprobante',
+    'Evento':             CFG.eventName,
+    'Fecha del evento':   CFG.eventDateFormatted,
+    'Venue':              CFG.venue,
+    'Dispositivo':        getDevice(),
   };
 
   try {
@@ -1039,7 +1035,6 @@ async function confirmar() {
       var a          = user.attendees[i];
       var ticketCode = orderCode + '-' + (i + 1);   // TRF-A3K9PQ-1, -2, -3 …
       var row = Object.assign({}, sharedBase, {
-        'Código ticket':      ticketCode,
         'N° ticket en orden': i + 1,
         'Nombre asistente':   a.nombre,
         'Apellido asistente': a.apellido,
@@ -1068,20 +1063,18 @@ function getDevice() {
 }
 
 function saveViaScript(payload) {
-  var json = JSON.stringify(payload);
-  try {
-    var blob = new Blob([json], {type:'application/json'});
-    var sent = navigator.sendBeacon('/api/save', blob);
-    if (!sent) throw new Error('sendBeacon returned false');
-  } catch(e) {
-    try {
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/save', true);
-      xhr.setRequestHeader('Content-Type','application/json');
-      xhr.send(json);
-    } catch(e2){}
-  }
-  return new Promise(function(resolve){ setTimeout(function(){ resolve({status:'ok'}); }, 600); });
+  // Single fetch — no fallback that could double-send.
+  // We await this in confirmar() so the overlay stays visible until done.
+  return fetch('/api/save', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload),
+  }).then(function(r) {
+    return r.json().catch(function() { return { status: 'ok' }; });
+  }).catch(function(err) {
+    console.warn('[save] fetch error:', err);
+    return { status: 'error', message: err.message };
+  });
 }
 
 // ══════════════════════════════════════════════════════════════════
