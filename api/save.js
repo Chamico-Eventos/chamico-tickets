@@ -1,7 +1,7 @@
 // api/save.js — Posts data to Apps Script doPost (no redirect chain)
 const https = require('https');
 
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxVWEywmYVj59mvdUYhkxhZJOwNxvj5rWZUOtqbi8uCLj3kQiVFRiG5BqunH0zSnO4/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec';
 
 function post(targetUrl, body, hops) {
   hops = hops || 0;
