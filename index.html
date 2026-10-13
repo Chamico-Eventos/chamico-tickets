@@ -240,6 +240,27 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-he
 .back-btn{display:flex;align-items:center;justify-content:center;gap:8px;max-width:520px;margin:0 auto 4px;padding:12px 20px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:var(--r);color:var(--gold);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;letter-spacing:.02em}
 .back-btn:hover{background:rgba(201,168,76,0.12);color:var(--gold2);border-color:rgba(201,168,76,0.45)}
 .cat-footer-wrap{text-align:center;padding:20px 24px 32px;border-top:1px solid rgba(255,255,255,.06)}
+
+/* ── Eventos pasados ─────────────────────────────────────────── */
+.ev-card.ev-past { opacity: .65; cursor: default !important; }
+.ev-card.ev-past .ev-card-img { filter: grayscale(80%); }
+.ev-card.ev-past .ev-btn {
+  background: var(--surface2);
+  color: var(--muted);
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
+}
+.ev-past-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: rgba(14,13,11,.82);
+  border: 1px solid rgba(255,255,255,.18);
+  color: var(--muted);
+  font-size: 10px; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 4px 10px; border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
 </style>
 </head>
 <body>
@@ -512,7 +533,13 @@ function renderCatalog() {
     pt.textContent   = frase;
     pt.style.display = frase ? 'block' : 'none';
   }
-  var sorted = EVENTS.slice().sort(function(a,b){ return a.dateSort - b.dateSort; });
+  var now = new Date();
+  var sorted = EVENTS.slice().sort(function(a,b){
+    var aP = a.isPast || (a.date && new Date(a.date+'T23:59:59') < now);
+    var bP = b.isPast || (b.date && new Date(b.date+'T23:59:59') < now);
+    if (aP !== bP) return aP ? 1 : -1;   // past events go last
+    return a.dateSort - b.dateSort;
+  });
   var grid = document.getElementById('events-grid');
   grid.innerHTML = sorted.map(createEventCard).join('');
 
@@ -551,8 +578,11 @@ function createEventCard(ev) {
     : '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[0]+'\')"></div>'+
       '<div class="ev-card-img-half" style="background-image:url(\''+ev.images[1]+'\')"></div>';
 
-  return '<div class="ev-card" data-evid="'+ev.id+'" style="cursor:pointer">'+
-    '<div class="ev-card-img">'+imgHtml+'</div>'+
+  var isPast = ev.isPast || (ev.date && new Date(ev.date + 'T23:59:59') < new Date());
+  return '<div class="ev-card'+(isPast?' ev-past':'')+'" data-evid="'+ev.id+'" style="cursor:'+(isPast?'default':'pointer')+'">'+
+    '<div class="ev-card-img" style="position:relative">'+
+    (isPast?'<span class="ev-past-badge">Evento finalizado</span>':'')+
+    imgHtml+'</div>'+
     '<div class="ev-card-body">'+
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
     (ev.venueLogo?'<img src="'+ev.venueLogo+'" style="height:22px;width:22px;border-radius:50%;opacity:.75;flex-shrink:0">':'')+
@@ -565,7 +595,8 @@ function createEventCard(ev) {
       '<span class="ev-price">$'+ev.price.toLocaleString('es-AR')+'</span>'+
       '<span class="preventa-badge" style="font-size:9px;padding:2px 8px">Preventa</span>'+
     '</div>'+
-    '<button class="ev-btn" id="btn-'+ev.id+'">Ver y comprar entradas →</button>'+
+    '<button class="ev-btn" id="btn-'+ev.id+'"'+(isPast?' disabled style="cursor:not-allowed"':'')+'>'+
+    (isPast ? 'Evento finalizado' : 'Ver y comprar entradas →')+'</button>'+
     '<p class="ev-avail" id="avail-'+ev.id+'"></p>'+
     '</div></div>';
 }
@@ -1113,6 +1144,8 @@ function copyAlias() {
 //  SELECT EVENT
 // ══════════════════════════════════════════════════════════════════
 window.selectEvent = function(eventId) {
+  var ev0 = EVENTS.find(function(e){ return e.id === eventId; });
+  if (ev0 && (ev0.isPast || (ev0.date && new Date(ev0.date+'T23:59:59') < new Date()))) return;
   var catalog   = document.getElementById('view-catalog');
   var eventView = document.getElementById('view-event');
   if (catalog)   catalog.style.display   = 'none';
